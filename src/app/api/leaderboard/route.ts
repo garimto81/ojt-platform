@@ -1,12 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 
 // GET /api/leaderboard - 리더보드 조회
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = createClient()
 
     // 인증 확인
     const { data: { user }, error: authError } = await supabase.auth.getUser()

@@ -1,12 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 
 // GET /api/curriculum - 전체 커리큘럼 조회 (Day별 레슨 포함)
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = createClient()
 
     // 인증 확인
     const { data: { user }, error: authError } = await supabase.auth.getUser()

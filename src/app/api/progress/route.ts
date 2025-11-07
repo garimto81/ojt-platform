@@ -1,12 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 
 // POST /api/progress - 학습 진행률 업데이트
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = createClient()
 
     // 인증 확인
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -121,8 +119,7 @@ export async function POST(request: NextRequest) {
 // GET /api/progress - 사용자 진행률 조회
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = createClient()
 
     // 인증 확인
     const { data: { user }, error: authError } = await supabase.auth.getUser()
