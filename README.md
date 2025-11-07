@@ -1,0 +1,272 @@
+# 🎓 GG Production Knowledge Platform
+
+**Professional Poker Training Platform with AI-Powered Quiz Generation**
+
+A comprehensive learning management system built for GG Production's poker training program, featuring a 7-day structured curriculum, AI-generated assessments, and gamified learning progression.
+
+![Next.js](https://img.shields.io/badge/Next.js-14.0.4-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green)
+![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-orange)
+
+---
+
+## ✨ Key Features
+
+### 🎯 For Learners
+- **7-Day Structured Curriculum** - Progressive learning from poker basics to advanced strategies
+- **Interactive Lessons** - Rich markdown content with multimedia support
+- **AI-Generated Quizzes** - Adaptive assessments based on lesson content
+- **Points & Leaderboard** - Gamified learning with competitive rankings
+- **Progress Tracking** - Real-time statistics and completion tracking
+- **Mobile-Responsive** - Learn anywhere on any device
+
+### 👨‍💼 For Administrators
+- **Content Management** - Easy-to-use lesson editor with markdown support
+- **AI Quiz Generator** - Automatically create quizzes from lesson content using GPT-4o
+- **User Management** - Role-based access control (Admin, Trainer, Trainee)
+- **Analytics Dashboard** - Track student progress and engagement
+
+---
+
+## 🏗️ Tech Stack
+
+### Frontend
+- **Next.js 14** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling with WSOP brand theme
+- **Lucide Icons** - Modern icon library
+- **React Markdown** - Rich content rendering
+
+### Backend
+- **Supabase** - PostgreSQL database with real-time subscriptions
+- **Row Level Security (RLS)** - Database-level authorization
+- **Server Components** - Optimized server-side rendering
+- **API Routes** - RESTful endpoints for data mutations
+
+### AI Integration
+- **OpenAI GPT-4o** - Intelligent quiz generation
+- **Structured JSON Output** - Reliable, parseable responses
+- **Context-Aware** - Generates questions based on lesson content
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- Supabase account
+- OpenAI API key
+
+### Quick Start
+
+```bash
+# Clone repository
+git clone [your-repo-url]
+cd ggp-platform
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your credentials
+
+# Run database migrations
+cd supabase
+supabase link --project-ref [YOUR-PROJECT-REF]
+supabase db push
+
+# Start development server
+cd ..
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) 🎉
+
+---
+
+## 🗄️ Database Schema
+
+```sql
+profiles              # User accounts and roles
+├── curriculum_days   # 7-day program structure
+│   └── lessons       # Individual lesson content
+│       ├── user_progress      # Completion tracking
+│       └── quizzes           # AI-generated questions
+│           └── quiz_attempts # Student submissions
+├── leaderboard_snapshots     # Historical rankings
+└── achievements              # Badges and milestones
+```
+
+**Key Features:**
+- ✅ Automatic profile creation on signup
+- ✅ Trigger-based point accumulation
+- ✅ RLS policies for security
+- ✅ Optimized indexes for performance
+
+---
+
+## 🎨 UI/UX Highlights
+
+### WSOP Brand Identity
+- **Color Palette**: Red (#DA1F26), Black, Gold accents
+- **Typography**: Inter font family
+- **Design Language**: Bold, professional, competitive
+
+### Responsive Design
+- Mobile-first approach
+- Adaptive layouts for tablets and desktop
+- Touch-optimized interactions
+
+### Accessibility
+- Semantic HTML
+- ARIA labels
+- Keyboard navigation support
+
+---
+
+## 🤖 AI Quiz Generation
+
+### How It Works
+
+1. **Admin creates lesson content** in markdown
+2. **Click "Generate Quiz"** button
+3. **GPT-4o analyzes content** and extracts key concepts
+4. **Generates 5-20 questions** with:
+   - Multiple choice (4 options)
+   - True/False statements
+   - Short answer questions
+5. **Admin reviews** and activates questions
+6. **Students take quizzes** and earn points
+
+### Prompt Engineering
+
+The AI system uses a carefully crafted prompt that:
+- Understands poker training context
+- Generates educational, clear questions
+- Provides detailed explanations
+- Assigns appropriate difficulty points
+- Outputs structured JSON for reliability
+
+---
+
+## 📊 Project Structure
+
+```
+ggp-platform/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── dashboard/          # Main application
+│   │   │   ├── learning/       # Curriculum pages
+│   │   │   ├── admin/          # Admin tools
+│   │   │   └── profile/        # User settings
+│   │   └── api/                # Backend endpoints
+│   │       ├── quiz/           # Quiz operations
+│   │       ├── progress/       # Learning tracking
+│   │       └── admin/          # Admin APIs
+│   ├── components/             # Reusable UI components
+│   ├── lib/                    # Utilities
+│   │   ├── supabase/           # Database clients
+│   │   └── types/              # TypeScript definitions
+│   └── styles/                 # Global styles
+├── supabase/
+│   └── migrations/             # Database migrations
+├── public/                     # Static assets
+└── docs/                       # Documentation
+```
+
+---
+
+## 🚀 Deployment
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
+
+### Quick Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+1. Click the button above
+2. Connect your GitHub repository
+3. Add environment variables
+4. Deploy! 🎉
+
+---
+
+## 🔐 Security
+
+- **Environment Variables** - Secrets never committed to git
+- **Row Level Security** - Database policies protect user data
+- **Role-Based Access** - Admin, Trainer, Trainee permissions
+- **API Authentication** - Supabase Auth with JWT
+- **Input Validation** - Server-side validation for all mutations
+
+---
+
+## 📈 Roadmap
+
+### Phase 1: MVP (✅ Complete)
+- [x] User authentication
+- [x] 7-day curriculum
+- [x] Lesson content pages
+- [x] Quiz system
+- [x] AI quiz generation
+- [x] Leaderboard
+- [x] Admin content management
+
+### Phase 2: Enhancement (🚧 In Progress)
+- [ ] Real-time notifications
+- [ ] Achievement badges
+- [ ] Video lesson support
+- [ ] Discussion forums
+- [ ] Mobile app (React Native)
+
+### Phase 3: Advanced (📋 Planned)
+- [ ] Live training sessions
+- [ ] Peer review system
+- [ ] Advanced analytics
+- [ ] Multi-language support
+- [ ] API for integrations
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is proprietary software owned by GG Production.
+
+---
+
+## 🙋‍♂️ Support
+
+For questions or issues:
+
+- 📧 Email: support@ggproduction.com
+- 💬 Discord: [Join our community](https://discord.gg/ggprod)
+- 📖 Docs: [Full documentation](https://docs.ggproduction.com)
+
+---
+
+## 🎯 About GG Production
+
+GG Production is a leading poker training organization dedicated to developing professional poker players through structured, evidence-based training programs.
+
+**Website**: [www.ggproduction.com](https://www.ggproduction.com)
+
+---
+
+**Built with ❤️ by the GG Production Team**
+
+**Version**: 1.0.0 | **Status**: Production Ready | **Last Updated**: 2024-11-06

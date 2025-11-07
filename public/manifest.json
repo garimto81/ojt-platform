@@ -1,0 +1,16 @@
+{
+  "name": "GG Production Knowledge Platform",
+  "short_name": "GGP Platform",
+  "description": "Professional poker production training and knowledge management",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF6B35",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

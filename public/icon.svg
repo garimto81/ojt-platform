@@ -1,0 +1,6 @@
+<svg width="144" height="144" viewBox="0 0 144 144" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="144" height="144" rx="24" fill="#FF6B35"/>
+  <path d="M72 36C52.1177 36 36 52.1177 36 72C36 91.8823 52.1177 108 72 108C91.8823 108 108 91.8823 108 72C108 52.1177 91.8823 36 72 36ZM72 96C58.7452 96 48 85.2548 48 72C48 58.7452 58.7452 48 72 48C85.2548 48 96 58.7452 96 72C96 85.2548 85.2548 96 72 96Z" fill="white"/>
+  <path d="M72 60C65.3726 60 60 65.3726 60 72C60 78.6274 65.3726 84 72 84C78.6274 84 84 78.6274 84 72C84 65.3726 78.6274 60 72 60Z" fill="#FFD700"/>
+  <text x="72" y="78" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="white">G</text>
+</svg>

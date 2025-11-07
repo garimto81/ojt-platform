@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm install)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(npx tsx:*)",
+      "Bash(node:*)",
+      "Bash(find:*)",
+      "Bash(tasklist)",
+      "Bash(taskkill:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Read(//c/claude/**)",
+      "Bash(git log:*)",
+      "Bash(git init:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

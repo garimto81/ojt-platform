@@ -1,0 +1,421 @@
+// GG Production Knowledge Platform - Prisma Schema
+// Database: PostgreSQL (Supabase)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================
+// 1. USERS & AUTHENTICATION
+// ============================================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  avatarUrl     String?   @map("avatar_url")
+  bio           String?
+  role          UserRole  @default(LEARNER)
+  level         Int       @default(1)
+  points        Int       @default(0)
+  isActive      Boolean   @default(true) @map("is_active")
+  emailVerified Boolean   @default(false) @map("email_verified")
+  lastLoginAt   DateTime? @map("last_login_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  // Relations
+  contents         Content[]
+  reviews          Review[]
+  feedback         Feedback[]
+  learningProgress LearningProgress[]
+  achievements     UserAchievement[]
+  activities       Activity[]
+  notifications    Notification[]
+
+  @@index([email])
+  @@index([role])
+  @@index([createdAt])
+  @@map("users")
+}
+
+enum UserRole {
+  LEARNER
+  CREATOR
+  EXPERT
+  REVIEWER
+  ADMIN
+}
+
+// ============================================
+// 2. CONTENT MANAGEMENT
+// ============================================
+
+model Template {
+  id              String   @id @default(uuid())
+  name            String
+  category        String
+  description     String?
+  structure       Json
+  validationRules Json?    @map("validation_rules")
+  createdById     String?  @map("created_by_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  contents Content[]
+
+  @@index([category])
+  @@map("templates")
+}
+
+model Content {
+  id          String        @id @default(uuid())
+  title       String
+  slug        String        @unique
+  description String?
+  body        String        @db.Text
+  templateId  String?       @map("template_id")
+  authorId    String        @map("author_id")
+  category    String
+  difficulty  Difficulty    @default(BEGINNER)
+  status      ContentStatus @default(DRAFT)
+  version     Int           @default(1)
+  viewCount   Int           @default(0) @map("view_count")
+  rating      Float?
+  ratingCount Int           @default(0) @map("rating_count")
+  publishedAt DateTime?     @map("published_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  template Template?    @relation(fields: [templateId], references: [id])
+  author   User         @relation(fields: [authorId], references: [id])
+  reviews  Review[]
+  feedback Feedback[]
+  tags     ContentTag[]
+  media    Media[]
+
+  @@index([slug])
+  @@index([authorId])
+  @@index([category])
+  @@index([status])
+  @@index([publishedAt])
+  @@map("contents")
+}
+
+enum ContentStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+model ContentTag {
+  id        String   @id @default(uuid())
+  contentId String   @map("content_id")
+  tag       String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@unique([contentId, tag])
+  @@index([tag])
+  @@map("content_tags")
+}
+
+model Media {
+  id           String   @id @default(uuid())
+  contentId    String?  @map("content_id")
+  fileName     String   @map("file_name")
+  fileType     String   @map("file_type")
+  fileSize     Int      @map("file_size")
+  url          String
+  thumbnailUrl String?  @map("thumbnail_url")
+  uploadedById String   @map("uploaded_by_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  content Content? @relation(fields: [contentId], references: [id], onDelete: SetNull)
+
+  @@index([contentId])
+  @@map("media")
+}
+
+// ============================================
+// 3. QUALITY ASSURANCE
+// ============================================
+
+model Review {
+  id         String       @id @default(uuid())
+  contentId  String       @map("content_id")
+  reviewerId String       @map("reviewer_id")
+  rating     Int
+  comment    String?      @db.Text
+  status     ReviewStatus @default(PENDING)
+  reviewedAt DateTime?    @map("reviewed_at")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  content  Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  reviewer User    @relation(fields: [reviewerId], references: [id])
+
+  @@index([contentId])
+  @@index([reviewerId])
+  @@index([status])
+  @@map("reviews")
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  contentId String   @map("content_id")
+  userId    String   @map("user_id")
+  rating    Int
+  comment   String?  @db.Text
+  isHelpful Boolean? @map("is_helpful")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([contentId])
+  @@index([userId])
+  @@map("feedback")
+}
+
+// ============================================
+// 4. LEARNING MANAGEMENT
+// ============================================
+
+model LearningModule {
+  id          String   @id @default(uuid())
+  day         Int      @unique
+  title       String
+  subtitle    String
+  description String   @db.Text
+  objectives  Json
+  duration    Int // minutes
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  activities LearningActivity[]
+  progress   LearningProgress[]
+
+  @@index([day])
+  @@map("learning_modules")
+}
+
+model LearningActivity {
+  id          String       @id @default(uuid())
+  moduleId    String       @map("module_id")
+  type        ActivityType
+  title       String
+  description String?      @db.Text
+  contentId   String?      @map("content_id")
+  duration    Int // minutes
+  required    Boolean      @default(true)
+  order       Int
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  module   LearningModule     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress LearningProgress[]
+
+  @@index([moduleId])
+  @@index([type])
+  @@map("learning_activities")
+}
+
+enum ActivityType {
+  VIDEO
+  ARTICLE
+  QUIZ
+  EXERCISE
+  SIMULATION
+  PRACTICAL
+  PROJECT
+}
+
+model LearningProgress {
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")
+  moduleId    String         @map("module_id")
+  activityId  String?        @map("activity_id")
+  status      ProgressStatus @default(NOT_STARTED)
+  score       Int?
+  timeSpent   Int            @default(0) @map("time_spent") // minutes
+  startedAt   DateTime?      @map("started_at")
+  completedAt DateTime?      @map("completed_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module   LearningModule    @relation(fields: [moduleId], references: [id])
+  activity LearningActivity? @relation(fields: [activityId], references: [id])
+
+  @@unique([userId, moduleId, activityId])
+  @@index([userId])
+  @@index([status])
+  @@map("learning_progress")
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+// ============================================
+// 5. GAMIFICATION
+// ============================================
+
+model Achievement {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  icon        String
+  category    String
+  points      Int
+  requirement Json
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  userAchievements UserAchievement[]
+
+  @@index([category])
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  achievementId String   @map("achievement_id")
+  earnedAt      DateTime @default(now()) @map("earned_at")
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@map("user_achievements")
+}
+
+model Leaderboard {
+  id        String   @id @default(uuid())
+  period    String // daily, weekly, monthly, all-time
+  rank      Int
+  userId    String   @map("user_id")
+  points    Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([period, rank])
+  @@index([period, points])
+  @@map("leaderboard")
+}
+
+// ============================================
+// 6. NOTIFICATIONS & ACTIVITY
+// ============================================
+
+model Activity {
+  id          String          @id @default(uuid())
+  userId      String          @map("user_id")
+  type        ActivityLogType
+  description String
+  metadata    Json?
+  createdAt   DateTime        @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+enum ActivityLogType {
+  CONTENT_CREATED
+  CONTENT_PUBLISHED
+  REVIEW_SUBMITTED
+  LEARNING_COMPLETED
+  ACHIEVEMENT_EARNED
+  LEVEL_UP
+  LOGIN
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  title     String
+  message   String           @db.Text
+  type      NotificationType
+  isRead    Boolean          @default(false) @map("is_read")
+  actionUrl String?          @map("action_url")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  ACHIEVEMENT
+}
+
+// ============================================
+// 7. ANALYTICS
+// ============================================
+
+model PageView {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  path      String
+  referrer  String?
+  userAgent String?  @map("user_agent")
+  ipAddress String?  @map("ip_address")
+  sessionId String?  @map("session_id")
+  duration  Int? // seconds
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([path])
+  @@index([createdAt])
+  @@map("page_views")
+}
