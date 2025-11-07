@@ -17,13 +17,13 @@ export async function GET() {
       .select('user_id, status')
       .eq('status', 'completed')
 
-    // Count lessons per user
-    const completedByUser: { [key: string]: number } = {}
+    // Count completed lessons per user
+    const completedByUser: Record<string, number> = {}
     progressData?.forEach((progress) => {
       completedByUser[progress.user_id] = (completedByUser[progress.user_id] || 0) + 1
     })
 
-    // Get total lesson count
+    // Get total lessons count
     const { count: totalLessons } = await supabase
       .from('lessons')
       .select('*', { count: 'exact', head: true })
@@ -33,9 +33,12 @@ export async function GET() {
       (count) => count >= (totalLessons || 0)
     ).length
 
+    // Use default value 0 if totalTrainees is null
+    const safeTotal = totalTrainees || 0
+
     // Calculate deployment rate (users who completed all vs total)
-    const deploymentRate = totalTrainees && totalTrainees > 0
-      ? Math.round((graduatedTrainees / totalTrainees) * 100)
+    const deploymentRate = safeTotal > 0
+      ? Math.round((graduatedTrainees / safeTotal) * 100)
       : 0
 
     // Get curriculum duration (max day number)
@@ -52,8 +55,8 @@ export async function GET() {
       deploymentRate,      // 투입률 (%)
       graduatedTrainees,   // 수료 인원
       trainingDays,        // 교육 기간 (일)
-      totalTrainees,       // 전체 교육생
-      activeTrainees: totalTrainees - graduatedTrainees  // 학습 중
+      totalTrainees: safeTotal,       // 전체 교육생
+      activeTrainees: safeTotal - graduatedTrainees  // 학습 중
     })
 
   } catch (error: any) {
