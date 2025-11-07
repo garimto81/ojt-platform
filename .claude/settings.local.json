@@ -21,7 +21,8 @@
       "Read(//c/claude/**)",
       "Bash(git log:*)",
       "Bash(git init:*)",
-      "Bash(git remote add:*)"
+      "Bash(git remote add:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []
