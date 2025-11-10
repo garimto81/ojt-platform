@@ -61,6 +61,29 @@ A comprehensive learning management system built for GG Production's poker train
 
 ### Quick Start
 
+#### 방법 1: 자동 설정 (권장) ⚡
+
+```bash
+# Clone repository
+git clone [your-repo-url]
+cd ggp-platform
+
+# Install dependencies
+npm install
+
+# Supabase 환경 변수 자동 설정
+npm run setup:supabase
+# → Supabase 정보를 입력하면 .env.local 자동 생성
+
+# 환경 변수 확인
+npm run check-env
+
+# Start development server
+npm run dev
+```
+
+#### 방법 2: 수동 설정
+
 ```bash
 # Clone repository
 git clone [your-repo-url]
@@ -76,17 +99,13 @@ cp .env.example .env.local
 # Check environment variables
 npm run check-env
 
-# Run database migrations
-cd supabase
-supabase link --project-ref [YOUR-PROJECT-REF]
-supabase db push
-
 # Start development server
-cd ..
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) 🎉
+
+📖 **빠른 시작 가이드**: [QUICK_SETUP_GUIDE.md](./QUICK_SETUP_GUIDE.md)
 
 ---
 
@@ -255,7 +274,25 @@ npm run check-env
 
 ### Vercel 배포
 
-로컬 환경에서 프로덕션으로 배포하는 방법:
+#### ⚡ CLI 자동 설정 (가장 빠름)
+
+```bash
+# 1. Vercel 로그인
+vercel login
+
+# 2. Vercel 환경 변수 자동 설정
+npm run setup:vercel
+# → 대화형으로 Supabase & Gemini 정보 입력
+# → Vercel Production/Preview 환경 변수 자동 설정
+
+# 3. Supabase Redirect URLs 설정
+# → Supabase Dashboard에서 Vercel 도메인 추가
+
+# 4. 배포
+git push origin main
+```
+
+#### 🔧 수동 설정
 
 1. **환경 변수 설정 가이드 확인**
    ```bash
@@ -278,7 +315,9 @@ npm run check-env
    vercel deploy --prod
    ```
 
-📖 **상세 가이드**: [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
+📖 **상세 가이드**:
+- [QUICK_SETUP_GUIDE.md](./QUICK_SETUP_GUIDE.md) - CLI 자동화 스크립트
+- [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md) - 완전 가이드
 
 ---
 

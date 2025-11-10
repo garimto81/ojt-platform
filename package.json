@@ -11,7 +11,9 @@
     "test:ci": "jest --ci",
     "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
     "check-env": "node scripts/check-env.js",
-    "prebuild": "node scripts/check-env.js"
+    "prebuild": "node scripts/check-env.js",
+    "setup:supabase": "node scripts/get-supabase-config.js",
+    "setup:vercel": "node scripts/setup-vercel-env.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
