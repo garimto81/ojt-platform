@@ -33,7 +33,17 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error('Error exchanging code for session:', error)
-      return NextResponse.redirect(`${origin}/login?error=인증에 실패했습니다`)
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        name: error.name,
+      })
+
+      // 에러 메시지를 사용자에게 전달
+      const errorMessage = encodeURIComponent(
+        error.message || '인증에 실패했습니다'
+      )
+      return NextResponse.redirect(`${origin}/login?error=${errorMessage}`)
     }
   }
 
