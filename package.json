@@ -13,7 +13,8 @@
     "check-env": "node scripts/check-env.js",
     "prebuild": "node scripts/check-env.js",
     "setup:supabase": "node scripts/get-supabase-config.js",
-    "setup:vercel": "node scripts/setup-vercel-env.js"
+    "setup:vercel": "node scripts/setup-vercel-env.js",
+    "create-pr": "bash scripts/create-pr-api.sh"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
