@@ -73,6 +73,9 @@ npm install
 cp .env.example .env.local
 # Edit .env.local with your credentials
 
+# Check environment variables
+npm run check-env
+
 # Run database migrations
 cd supabase
 supabase link --project-ref [YOUR-PROJECT-REF]
@@ -228,6 +231,54 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 - [ ] Advanced analytics
 - [ ] Multi-language support
 - [ ] API for integrations
+
+---
+
+## 🌐 환경 변수 & 배포
+
+### 환경 변수 확인
+
+프로젝트는 환경 변수 검증 스크립트를 제공합니다:
+
+```bash
+# 환경 변수 설정 확인
+npm run check-env
+```
+
+### 필수 환경 변수
+
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase 프로젝트 URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase 익명 키
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase 서비스 역할 키 (프로덕션)
+- `GEMINI_API_KEY` - Google Gemini API 키
+- `NEXT_PUBLIC_APP_URL` - 애플리케이션 URL
+
+### Vercel 배포
+
+로컬 환경에서 프로덕션으로 배포하는 방법:
+
+1. **환경 변수 설정 가이드 확인**
+   ```bash
+   # 상세한 가이드 문서
+   cat VERCEL_DEPLOYMENT_GUIDE.md
+   ```
+
+2. **Vercel에 환경 변수 추가**
+   - Vercel 대시보드 → Settings → Environment Variables
+   - 모든 필수 환경 변수 추가
+
+3. **Supabase 리디렉션 URL 설정**
+   - Supabase → Authentication → URL Configuration
+   - Vercel 도메인을 Redirect URLs에 추가
+
+4. **배포**
+   ```bash
+   git push origin main
+   # 또는 Vercel CLI 사용
+   vercel deploy --prod
+   ```
+
+📖 **상세 가이드**: [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
 
 ---
 
