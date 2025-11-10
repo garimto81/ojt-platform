@@ -277,7 +277,7 @@ async function main() {
   console.log(`   - Slug: ${sampleContent.slug}`)
   console.log(`   - Content length: ${sampleContent.body.length} characters`)
   console.log(`   - Status: ${sampleContent.status}`)
-  console.log(`   - Tags: ${sampleContent.tags.map(t => t.tag).join(', ')}`)
+  console.log(`   - Tags: ${sampleContent.tags.map((t: any) => t.tag).join(', ')}`)
 
   console.log('\n🎉 Seed completed successfully!')
   console.log('\n📊 Summary:')

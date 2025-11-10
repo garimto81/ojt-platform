@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // GET /api/leaderboard - 리더보드 조회
 export async function GET() {
   try {

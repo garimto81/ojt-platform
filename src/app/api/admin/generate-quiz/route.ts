@@ -2,7 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
+// Validate GEMINI_API_KEY at initialization
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error('GEMINI_API_KEY 환경 변수가 설정되지 않았습니다. .env 파일을 확인해주세요.')
+}
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
 export async function POST(request: NextRequest) {
   try {

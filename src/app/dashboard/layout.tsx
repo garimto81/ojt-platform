@@ -21,6 +21,7 @@ import {
   Shield
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { createClient } from '@/lib/supabase/client'
 
 interface NavItem {
   label: string
@@ -51,11 +52,37 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [userRole, setUserRole] = useState<string>('trainee') // TODO: Fetch from profile
+  const [userRole, setUserRole] = useState<string>('trainee')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+  }, [])
+
+  // Fetch user role from database
+  useEffect(() => {
+    async function fetchUserRole() {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single()
+
+          if (profile?.role) {
+            setUserRole(profile.role)
+          }
+        }
+      } catch (error) {
+        console.error('사용자 역할 가져오기 실패:', error)
+      }
+    }
+
+    fetchUserRole()
   }, [])
 
   return (
