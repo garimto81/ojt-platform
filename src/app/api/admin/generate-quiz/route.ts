@@ -2,13 +2,6 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-// Validate GEMINI_API_KEY at initialization
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error('GEMINI_API_KEY 환경 변수가 설정되지 않았습니다. .env 파일을 확인해주세요.')
-}
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-
 export async function POST(request: NextRequest) {
   try {
     const supabase = createClient()
@@ -69,6 +62,17 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Validate GEMINI_API_KEY only when actually needed
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json(
+        { error: 'GEMINI_API_KEY가 설정되지 않았습니다. 관리자에게 문의하세요.' },
+        { status: 500 }
+      )
+    }
+
+    // Initialize Gemini AI (lazy initialization)
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
     // Generate quizzes using Gemini
     const prompt = `
