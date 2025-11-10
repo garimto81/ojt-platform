@@ -11,12 +11,27 @@ export async function middleware(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+  // 서버 사이드 디버깅 로그
+  console.log('🔍 Middleware - Supabase Config Check:')
+  console.log('  NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? `✅ ${supabaseUrl}` : '❌ Missing')
+  console.log('  NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseKey ? `✅ ${supabaseKey.substring(0, 30)}...` : '❌ Missing')
+
   // Supabase 환경 변수는 로그인에 필수이므로 검증
   // 하지만 앱을 크래시시키지 않고 에러 페이지로 리디렉션
   if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Supabase environment variables')
+    console.error('❌ Missing Supabase environment variables')
     return NextResponse.json(
       { error: 'Server configuration error. Please contact administrator.' },
+      { status: 500 }
+    )
+  }
+
+  // Key 형식 검증
+  if (!supabaseKey.startsWith('eyJ')) {
+    console.error('❌ Invalid Supabase Anon Key format. Should start with "eyJ"')
+    console.error('   Current key starts with:', supabaseKey.substring(0, 20))
+    return NextResponse.json(
+      { error: 'Server configuration error. Invalid API key format.' },
       { status: 500 }
     )
   }
@@ -67,9 +82,22 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // Supabase API 호출 시도
+  let user = null
+  try {
+    const { data, error } = await supabase.auth.getUser()
+
+    if (error) {
+      console.error('❌ Supabase auth.getUser() error:', error)
+      console.error('   Error message:', error.message)
+      console.error('   Error status:', error.status)
+    }
+
+    user = data?.user || null
+  } catch (error: any) {
+    console.error('❌ Supabase API call exception:', error)
+    console.error('   Exception message:', error.message)
+  }
 
   // Protected routes - require authentication
   if (request.nextUrl.pathname.startsWith('/dashboard') ||
