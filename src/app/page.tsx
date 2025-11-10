@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowRight, BookOpen, Users, Trophy, Zap, Loader2 } from 'lucide-react'
 
@@ -70,7 +70,16 @@ export default function HomePage() {
     trainingDays: 7
   })
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  // URL 쿼리 파라미터에서 에러 메시지 읽기
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam) {
+      setError(decodeURIComponent(errorParam))
+    }
+  }, [searchParams])
 
   // Check if user is already logged in
   useEffect(() => {
