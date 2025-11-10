@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // GET /api/curriculum - 전체 커리큘럼 조회 (Day별 레슨 포함)
 export async function GET() {
   try {

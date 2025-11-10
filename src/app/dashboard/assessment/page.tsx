@@ -34,6 +34,28 @@ export default function AssessmentPage() {
   const [showResults, setShowResults] = useState(false)
   const [timeElapsed, setTimeElapsed] = useState(0)
 
+  // 질문이 없을 경우 처리
+  if (sampleQuestions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardHeader className="text-center">
+            <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+            <CardTitle>평가 문제 준비 중</CardTitle>
+            <CardDescription>
+              현재 이용 가능한 평가 문제가 없습니다. 관리자에게 문의해주세요.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => router.push('/dashboard')} className="w-full">
+              대시보드로 돌아가기
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   const handleAnswer = (questionId: string, answerIndex: number) => {
     setSelectedAnswers({ ...selectedAnswers, [questionId]: answerIndex })
   }
