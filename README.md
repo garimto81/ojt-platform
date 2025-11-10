@@ -61,6 +61,29 @@ A comprehensive learning management system built for GG Production's poker train
 
 ### Quick Start
 
+#### 방법 1: 자동 설정 (권장) ⚡
+
+```bash
+# Clone repository
+git clone [your-repo-url]
+cd ggp-platform
+
+# Install dependencies
+npm install
+
+# Supabase 환경 변수 자동 설정
+npm run setup:supabase
+# → Supabase 정보를 입력하면 .env.local 자동 생성
+
+# 환경 변수 확인
+npm run check-env
+
+# Start development server
+npm run dev
+```
+
+#### 방법 2: 수동 설정
+
 ```bash
 # Clone repository
 git clone [your-repo-url]
@@ -73,17 +96,16 @@ npm install
 cp .env.example .env.local
 # Edit .env.local with your credentials
 
-# Run database migrations
-cd supabase
-supabase link --project-ref [YOUR-PROJECT-REF]
-supabase db push
+# Check environment variables
+npm run check-env
 
 # Start development server
-cd ..
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) 🎉
+
+📖 **빠른 시작 가이드**: [QUICK_SETUP_GUIDE.md](./QUICK_SETUP_GUIDE.md)
 
 ---
 
@@ -228,6 +250,74 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 - [ ] Advanced analytics
 - [ ] Multi-language support
 - [ ] API for integrations
+
+---
+
+## 🌐 환경 변수 & 배포
+
+### 환경 변수 확인
+
+프로젝트는 환경 변수 검증 스크립트를 제공합니다:
+
+```bash
+# 환경 변수 설정 확인
+npm run check-env
+```
+
+### 필수 환경 변수
+
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase 프로젝트 URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase 익명 키
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase 서비스 역할 키 (프로덕션)
+- `GEMINI_API_KEY` - Google Gemini API 키
+- `NEXT_PUBLIC_APP_URL` - 애플리케이션 URL
+
+### Vercel 배포
+
+#### ⚡ CLI 자동 설정 (가장 빠름)
+
+```bash
+# 1. Vercel 로그인
+vercel login
+
+# 2. Vercel 환경 변수 자동 설정
+npm run setup:vercel
+# → 대화형으로 Supabase & Gemini 정보 입력
+# → Vercel Production/Preview 환경 변수 자동 설정
+
+# 3. Supabase Redirect URLs 설정
+# → Supabase Dashboard에서 Vercel 도메인 추가
+
+# 4. 배포
+git push origin main
+```
+
+#### 🔧 수동 설정
+
+1. **환경 변수 설정 가이드 확인**
+   ```bash
+   # 상세한 가이드 문서
+   cat VERCEL_DEPLOYMENT_GUIDE.md
+   ```
+
+2. **Vercel에 환경 변수 추가**
+   - Vercel 대시보드 → Settings → Environment Variables
+   - 모든 필수 환경 변수 추가
+
+3. **Supabase 리디렉션 URL 설정**
+   - Supabase → Authentication → URL Configuration
+   - Vercel 도메인을 Redirect URLs에 추가
+
+4. **배포**
+   ```bash
+   git push origin main
+   # 또는 Vercel CLI 사용
+   vercel deploy --prod
+   ```
+
+📖 **상세 가이드**:
+- [QUICK_SETUP_GUIDE.md](./QUICK_SETUP_GUIDE.md) - CLI 자동화 스크립트
+- [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md) - 완전 가이드
 
 ---
 
