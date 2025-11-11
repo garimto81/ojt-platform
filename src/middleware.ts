@@ -1,120 +1,62 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { withAuth } from 'next-auth/middleware'
+import { NextResponse } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
+/**
+ * NextAuth.js Middleware
+ *
+ * SSO System과 연동하여 인증을 체크합니다.
+ * - /dashboard, /admin 경로는 인증 필요
+ * - 인증되지 않은 사용자는 메인 페이지(/)로 리디렉션
+ * - 인증된 사용자가 메인 페이지 접근 시 /dashboard로 리디렉션
+ */
+export default withAuth(
+  function middleware(req) {
+    const token = req.nextauth.token
+    const pathname = req.nextUrl.pathname
+
+    console.log('🔍 NextAuth Middleware Check:')
+    console.log('  Path:', pathname)
+    console.log('  Authenticated:', !!token)
+    if (token) {
+      console.log('  User:', token.email)
+      console.log('  Role:', token.role)
+    }
+
+    // 인증된 사용자가 메인 페이지(/) 접근 시 dashboard로 리디렉션
+    if (token && pathname === '/') {
+      console.log('  ↪ Redirecting to /dashboard (user already authenticated)')
+      return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
+
+    // 정상 진행
+    return NextResponse.next()
+  },
+  {
+    // 커스텀 로그인 페이지 설정
+    pages: {
+      signIn: '/',  // 메인 페이지를 로그인 페이지로 사용
     },
-  })
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    callbacks: {
+      authorized: ({ token, req }) => {
+        const pathname = req.nextUrl.pathname
 
-  // 서버 사이드 디버깅 로그
-  console.log('🔍 Middleware - Supabase Config Check:')
-  console.log('  NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? `✅ ${supabaseUrl}` : '❌ Missing')
-  console.log('  NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseKey ? `✅ ${supabaseKey.substring(0, 30)}...` : '❌ Missing')
+        // /dashboard, /admin은 인증 필요
+        if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) {
+          return !!token
+        }
 
-  // Supabase 환경 변수는 로그인에 필수이므로 검증
-  // 하지만 앱을 크래시시키지 않고 에러 페이지로 리디렉션
-  if (!supabaseUrl || !supabaseKey) {
-    console.error('❌ Missing Supabase environment variables')
-    return NextResponse.json(
-      { error: 'Server configuration error. Please contact administrator.' },
-      { status: 500 }
-    )
-  }
+        // /api/auth/* 는 NextAuth가 처리
+        if (pathname.startsWith('/api/auth')) {
+          return true
+        }
 
-  // Key 형식 검증
-  if (!supabaseKey.startsWith('eyJ')) {
-    console.error('❌ Invalid Supabase Anon Key format. Should start with "eyJ"')
-    console.error('   Current key starts with:', supabaseKey.substring(0, 20))
-    return NextResponse.json(
-      { error: 'Server configuration error. Invalid API key format.' },
-      { status: 500 }
-    )
-  }
-
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseKey,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-        },
+        // 기타 경로는 모두 허용 (메인 페이지, 공개 페이지 등)
+        return true
       },
-    }
-  )
-
-  // Supabase API 호출 시도
-  let user = null
-  try {
-    const { data, error } = await supabase.auth.getUser()
-
-    if (error) {
-      console.error('❌ Supabase auth.getUser() error:', error)
-      console.error('   Error message:', error.message)
-      console.error('   Error status:', error.status)
-    }
-
-    user = data?.user || null
-  } catch (error: any) {
-    console.error('❌ Supabase API call exception:', error)
-    console.error('   Exception message:', error.message)
+    },
   }
-
-  // Protected routes - require authentication
-  if (request.nextUrl.pathname.startsWith('/dashboard') ||
-      request.nextUrl.pathname.startsWith('/admin')) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
-  }
-
-  // Redirect authenticated users away from login/register
-  if ((request.nextUrl.pathname === '/login' ||
-       request.nextUrl.pathname === '/register') && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
-
-  return response
-}
+)
 
 export const config = {
   matcher: [

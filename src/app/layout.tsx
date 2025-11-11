@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { Providers } from '@/providers/session-provider'
 
 export const metadata: Metadata = {
   title: 'GG Production Knowledge Platform',
@@ -20,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className="h-full">
-      <body className="h-full font-sans">{children}</body>
+      <body className="h-full font-sans">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }

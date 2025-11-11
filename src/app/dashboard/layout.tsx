@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import {
   Home,
   BookOpen,
@@ -21,7 +22,6 @@ import {
   Shield
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/client'
 
 interface NavItem {
   label: string
@@ -51,39 +51,18 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const { data: session, status } = useSession()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [userRole, setUserRole] = useState<string>('trainee')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Fetch user role from database
-  useEffect(() => {
-    async function fetchUserRole() {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single()
-
-          if (profile?.role) {
-            setUserRole(profile.role)
-          }
-        }
-      } catch (error) {
-        console.error('사용자 역할 가져오기 실패:', error)
-      }
-    }
-
-    fetchUserRole()
-  }, [])
+  // Get user role from NextAuth session
+  const userRole = session?.user?.role || 'trainee'
+  const userName = session?.user?.name || 'User'
+  const userEmail = session?.user?.email || ''
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -191,8 +170,8 @@ export default function DashboardLayout({
               <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium">John Doe</p>
-              <p className="text-xs text-gray-500">Trainee</p>
+              <p className="text-sm font-medium">{userName}</p>
+              <p className="text-xs text-gray-500 capitalize">{userRole}</p>
             </div>
           </div>
           <div className="mt-2 space-y-1">

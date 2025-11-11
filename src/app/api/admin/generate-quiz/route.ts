@@ -1,15 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth/options'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    // Verify user is authenticated with NextAuth
+    const session = await getServerSession(authOptions)
 
-    // Verify user is authenticated and is admin/trainer
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-    if (authError || !user) {
+    if (!session || !session.user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -17,18 +17,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is admin or trainer
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    const userRole = session.user.role
 
-    if (!profile || !['admin', 'trainer'].includes(profile.role)) {
+    if (!['admin', 'trainer'].includes(userRole)) {
       return NextResponse.json(
         { error: 'Forbidden: Only admins and trainers can generate quizzes' },
         { status: 403 }
       )
     }
+
+    // Supabase client for database queries (not for auth)
+    const supabase = createClient()
 
     const { lesson_id, question_count = 5, question_types = ['multiple_choice', 'true_false'] } = await request.json()
 
