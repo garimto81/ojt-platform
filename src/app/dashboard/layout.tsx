@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, memo, useCallback, startTransition } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   Home,
   BookOpen,
@@ -52,16 +52,22 @@ interface NavItemComponentProps {
   isActive: boolean
   activeClassName: string
   inactiveClassName: string
+  onNavigate: (href: string) => void
 }
 
-const NavItemComponent = memo(({ item, isActive, activeClassName, inactiveClassName }: NavItemComponentProps) => {
+const NavItemComponent = memo(({ item, isActive, activeClassName, inactiveClassName, onNavigate }: NavItemComponentProps) => {
   const Icon = item.icon
+
+  const handleClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    onNavigate(item.href)
+  }, [item.href, onNavigate])
+
   return (
-    <Link
+    <a
       href={item.href}
-      prefetch={false}
-      scroll={false}
-      className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+      onClick={handleClick}
+      className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${
         isActive ? activeClassName : inactiveClassName
       }`}
     >
@@ -78,7 +84,7 @@ const NavItemComponent = memo(({ item, isActive, activeClassName, inactiveClassN
           {item.badge}
         </span>
       )}
-    </Link>
+    </a>
   )
 }, (prevProps, nextProps) => {
   // Custom comparison: Only re-render if isActive state actually changed
@@ -87,7 +93,8 @@ const NavItemComponent = memo(({ item, isActive, activeClassName, inactiveClassN
     prevProps.isActive === nextProps.isActive &&
     prevProps.item.href === nextProps.item.href &&
     prevProps.activeClassName === nextProps.activeClassName &&
-    prevProps.inactiveClassName === nextProps.inactiveClassName
+    prevProps.inactiveClassName === nextProps.inactiveClassName &&
+    prevProps.onNavigate === nextProps.onNavigate
   )
 })
 NavItemComponent.displayName = 'NavItemComponent'
@@ -99,9 +106,10 @@ interface NavigationListProps {
   mounted: boolean
   activeClassName: string
   inactiveClassName: string
+  onNavigate: (href: string) => void
 }
 
-const NavigationList = memo(({ items, pathname, mounted, activeClassName, inactiveClassName }: NavigationListProps) => {
+const NavigationList = memo(({ items, pathname, mounted, activeClassName, inactiveClassName, onNavigate }: NavigationListProps) => {
   // Calculate isActive for all items once, only when pathname/mounted changes
   const itemsWithActive = useMemo(() =>
     items.map((item) => ({
@@ -121,6 +129,7 @@ const NavigationList = memo(({ items, pathname, mounted, activeClassName, inacti
             isActive={isActive}
             activeClassName={activeClassName}
             inactiveClassName={inactiveClassName}
+            onNavigate={onNavigate}
           />
         </li>
       ))}
@@ -134,9 +143,10 @@ interface AdminNavigationProps {
   userRole: string
   pathname: string
   mounted: boolean
+  onNavigate: (href: string) => void
 }
 
-const AdminNavigation = memo(({ userRole, pathname, mounted }: AdminNavigationProps) => {
+const AdminNavigation = memo(({ userRole, pathname, mounted, onNavigate }: AdminNavigationProps) => {
   if (userRole !== 'admin' && userRole !== 'trainer') {
     return null
   }
@@ -153,6 +163,7 @@ const AdminNavigation = memo(({ userRole, pathname, mounted }: AdminNavigationPr
         mounted={mounted}
         activeClassName="bg-wsop-red text-white"
         inactiveClassName="hover:bg-gray-100 dark:hover:bg-gray-800"
+        onNavigate={onNavigate}
       />
     </div>
   )
@@ -200,6 +211,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   // 개발 모드: 기본 admin 역할 설정 (TODO: 로그인 시스템 활성화 시 'trainee'로 변경)
   const [userRole, setUserRole] = useState<string>('admin')
@@ -221,6 +233,13 @@ export default function DashboardLayout({
 
     return () => clearTimeout(timeoutId)
   }, [pathname])
+
+  // Navigation handler using useRouter instead of Next.js Link
+  const handleNavigate = useCallback((href: string) => {
+    startTransition(() => {
+      router.push(href)
+    })
+  }, [router])
 
   // Memoize sidebar toggle handler
   const toggleSidebar = useCallback(() => {
@@ -267,6 +286,7 @@ export default function DashboardLayout({
             mounted={mounted}
             activeClassName="bg-ggp-primary text-white"
             inactiveClassName="hover:bg-gray-100 dark:hover:bg-gray-800"
+            onNavigate={handleNavigate}
           />
 
           {/* Admin Section */}
@@ -274,6 +294,7 @@ export default function DashboardLayout({
             userRole={userRole}
             pathname={debouncedPathname}
             mounted={mounted}
+            onNavigate={handleNavigate}
           />
         </nav>
 
