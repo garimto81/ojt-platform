@@ -84,7 +84,7 @@ NavItemComponent.displayName = 'NavItemComponent'
 
 // Memoized Navigation List - only re-renders when pathname changes
 interface NavigationListProps {
-  items: NavItem[]
+  items: readonly NavItem[]
   pathname: string
   mounted: boolean
   activeClassName: string
