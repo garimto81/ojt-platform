@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, memo, useCallback } from 'react'
+import { useState, useEffect, useMemo, memo, useCallback, startTransition } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -60,6 +60,7 @@ const NavItemComponent = memo(({ item, isActive, activeClassName, inactiveClassN
     <Link
       href={item.href}
       prefetch={false}
+      scroll={false}
       className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
         isActive ? activeClassName : inactiveClassName
       }`}
@@ -78,6 +79,15 @@ const NavItemComponent = memo(({ item, isActive, activeClassName, inactiveClassN
         </span>
       )}
     </Link>
+  )
+}, (prevProps, nextProps) => {
+  // Custom comparison: Only re-render if isActive state actually changed
+  // This prevents unnecessary re-renders of inactive nav items during navigation
+  return (
+    prevProps.isActive === nextProps.isActive &&
+    prevProps.item.href === nextProps.item.href &&
+    prevProps.activeClassName === nextProps.activeClassName &&
+    prevProps.inactiveClassName === nextProps.inactiveClassName
   )
 })
 NavItemComponent.displayName = 'NavItemComponent'
@@ -155,17 +165,25 @@ interface BreadcrumbProps {
 }
 
 const Breadcrumb = memo(({ pathname }: BreadcrumbProps) => {
-  // useMemo to cache the current nav item lookup
-  const currentNavItem = useMemo(() => {
-    return navItems.find(item => pathname.startsWith(item.href))
-  }, [pathname])
+  // Simplified: No useMemo needed, direct find is fast enough
+  if (pathname === '/dashboard') {
+    return (
+      <div className="hidden lg:flex items-center gap-2 text-sm">
+        <span className="font-medium">Dashboard</span>
+      </div>
+    )
+  }
+
+  const currentNavItem = navItems.find(item =>
+    item.href !== '/dashboard' && pathname.startsWith(item.href)
+  ) || adminNavItems.find(item => pathname.startsWith(item.href))
 
   return (
     <div className="hidden lg:flex items-center gap-2 text-sm">
       <Link href="/dashboard" prefetch={false} className="text-gray-500 hover:text-gray-700">
         Dashboard
       </Link>
-      {pathname !== '/dashboard' && currentNavItem && (
+      {currentNavItem && (
         <>
           <ChevronRight className="h-4 w-4 text-gray-400" />
           <span className="font-medium">{currentNavItem.label}</span>
@@ -186,10 +204,23 @@ export default function DashboardLayout({
   // 개발 모드: 기본 admin 역할 설정 (TODO: 로그인 시스템 활성화 시 'trainee'로 변경)
   const [userRole, setUserRole] = useState<string>('admin')
   const [mounted, setMounted] = useState(false)
+  // Debounced pathname to reduce re-renders
+  const [debouncedPathname, setDebouncedPathname] = useState(pathname)
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Debounce pathname updates to prevent navigation throttling
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      startTransition(() => {
+        setDebouncedPathname(pathname)
+      })
+    }, 50) // 50ms debounce
+
+    return () => clearTimeout(timeoutId)
+  }, [pathname])
 
   // Memoize sidebar toggle handler
   const toggleSidebar = useCallback(() => {
@@ -232,7 +263,7 @@ export default function DashboardLayout({
           {/* Main Navigation */}
           <NavigationList
             items={navItems}
-            pathname={pathname}
+            pathname={debouncedPathname}
             mounted={mounted}
             activeClassName="bg-ggp-primary text-white"
             inactiveClassName="hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -241,7 +272,7 @@ export default function DashboardLayout({
           {/* Admin Section */}
           <AdminNavigation
             userRole={userRole}
-            pathname={pathname}
+            pathname={debouncedPathname}
             mounted={mounted}
           />
         </nav>
@@ -281,7 +312,7 @@ export default function DashboardLayout({
             </button>
 
             {/* Breadcrumb - Memoized */}
-            <Breadcrumb pathname={pathname} />
+            <Breadcrumb pathname={debouncedPathname} />
 
             {/* Right Section */}
             <div className="flex items-center gap-4">
