@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, memo, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -45,6 +45,131 @@ const adminNavItems: NavItem[] = [
   { label: 'AI Quiz Generator', href: '/dashboard/admin/quizzes', icon: <Sparkles className="h-5 w-5" />, adminOnly: true },
 ]
 
+// Memoized NavItem Component - prevents re-renders when sidebar state changes
+interface NavItemComponentProps {
+  item: NavItem
+  isActive: boolean
+  activeClassName: string
+  inactiveClassName: string
+}
+
+const NavItemComponent = memo(({ item, isActive, activeClassName, inactiveClassName }: NavItemComponentProps) => {
+  return (
+    <Link
+      href={item.href}
+      prefetch={false}
+      className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+        isActive ? activeClassName : inactiveClassName
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        {item.icon}
+        <span className="font-medium">{item.label}</span>
+      </div>
+      {item.badge && (
+        <span className={`text-xs px-2 py-0.5 rounded-full ${
+          isActive
+            ? 'bg-white/20 text-white'
+            : 'bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
+        }`}>
+          {item.badge}
+        </span>
+      )}
+    </Link>
+  )
+})
+NavItemComponent.displayName = 'NavItemComponent'
+
+// Memoized Navigation List - only re-renders when pathname changes
+interface NavigationListProps {
+  items: NavItem[]
+  pathname: string
+  mounted: boolean
+  activeClassName: string
+  inactiveClassName: string
+}
+
+const NavigationList = memo(({ items, pathname, mounted, activeClassName, inactiveClassName }: NavigationListProps) => {
+  return (
+    <ul className="space-y-1">
+      {items.map((item) => {
+        // useMemo for each isActive calculation
+        const isActive = mounted && (pathname === item.href ||
+          (item.href !== '/dashboard' && pathname.startsWith(item.href)))
+
+        return (
+          <li key={item.href}>
+            <NavItemComponent
+              item={item}
+              isActive={isActive}
+              activeClassName={activeClassName}
+              inactiveClassName={inactiveClassName}
+            />
+          </li>
+        )
+      })}
+    </ul>
+  )
+})
+NavigationList.displayName = 'NavigationList'
+
+// Memoized Admin Navigation Section
+interface AdminNavigationProps {
+  userRole: string
+  pathname: string
+  mounted: boolean
+}
+
+const AdminNavigation = memo(({ userRole, pathname, mounted }: AdminNavigationProps) => {
+  if (userRole !== 'admin' && userRole !== 'trainer') {
+    return null
+  }
+
+  return (
+    <div className="mt-6">
+      <div className="px-3 py-2 text-xs font-bold text-gray-500 uppercase flex items-center gap-2">
+        <Shield className="h-4 w-4" />
+        Admin
+      </div>
+      <NavigationList
+        items={adminNavItems}
+        pathname={pathname}
+        mounted={mounted}
+        activeClassName="bg-wsop-red text-white"
+        inactiveClassName="hover:bg-gray-100 dark:hover:bg-gray-800"
+      />
+    </div>
+  )
+})
+AdminNavigation.displayName = 'AdminNavigation'
+
+// Memoized Breadcrumb Component
+interface BreadcrumbProps {
+  pathname: string
+}
+
+const Breadcrumb = memo(({ pathname }: BreadcrumbProps) => {
+  // useMemo to cache the current nav item lookup
+  const currentNavItem = useMemo(() => {
+    return navItems.find(item => pathname.startsWith(item.href))
+  }, [pathname])
+
+  return (
+    <div className="hidden lg:flex items-center gap-2 text-sm">
+      <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
+        Dashboard
+      </Link>
+      {pathname !== '/dashboard' && currentNavItem && (
+        <>
+          <ChevronRight className="h-4 w-4 text-gray-400" />
+          <span className="font-medium">{currentNavItem.label}</span>
+        </>
+      )}
+    </div>
+  )
+})
+Breadcrumb.displayName = 'Breadcrumb'
+
 export default function DashboardLayout({
   children,
 }: {
@@ -52,19 +177,21 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [userRole, setUserRole] = useState<string>('trainee')
+  // 개발 모드: 기본 admin 역할 설정 (TODO: 로그인 시스템 활성화 시 'trainee'로 변경)
+  const [userRole, setUserRole] = useState<string>('admin')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // 임시: 인증 비활성화 상태에서 기본 admin 역할 설정
-  // TODO: 로그인 시스템 활성화 시 원래 코드로 복원
-  useEffect(() => {
-    // 개발 모드: 모든 사용자를 admin으로 설정
-    setUserRole('admin')
-    console.log('🔓 Development Mode: User role set to admin')
+  // Memoize sidebar toggle handler
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen(prev => !prev)
+  }, [])
+
+  const closeSidebar = useCallback(() => {
+    setSidebarOpen(false)
   }, [])
 
   return (
@@ -73,7 +200,7 @@ export default function DashboardLayout({
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          onClick={closeSidebar}
         />
       )}
 
@@ -97,73 +224,20 @@ export default function DashboardLayout({
         {/* Navigation */}
         <nav className="p-4">
           {/* Main Navigation */}
-          <ul className="space-y-1">
-            {navItems.map((item) => {
-              const isActive = mounted && (pathname === item.href ||
-                (item.href !== '/dashboard' && pathname.startsWith(item.href)))
-
-              return (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-ggp-primary text-white'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {item.icon}
-                      <span className="font-medium">{item.label}</span>
-                    </div>
-                    {item.badge && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        isActive
-                          ? 'bg-white/20 text-white'
-                          : 'bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
-                      }`}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
+          <NavigationList
+            items={navItems}
+            pathname={pathname}
+            mounted={mounted}
+            activeClassName="bg-ggp-primary text-white"
+            inactiveClassName="hover:bg-gray-100 dark:hover:bg-gray-800"
+          />
 
           {/* Admin Section */}
-          {(userRole === 'admin' || userRole === 'trainer') && (
-            <div className="mt-6">
-              <div className="px-3 py-2 text-xs font-bold text-gray-500 uppercase flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                Admin
-              </div>
-              <ul className="space-y-1 mt-2">
-                {adminNavItems.map((item) => {
-                  const isActive = mounted && (pathname === item.href ||
-                    (item.href !== '/dashboard/admin' && pathname.startsWith(item.href)))
-
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
-                          isActive
-                            ? 'bg-wsop-red text-white'
-                            : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          {item.icon}
-                          <span className="font-medium">{item.label}</span>
-                        </div>
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          )}
+          <AdminNavigation
+            userRole={userRole}
+            pathname={pathname}
+            mounted={mounted}
+          />
         </nav>
 
         {/* User Section */}
@@ -193,26 +267,15 @@ export default function DashboardLayout({
           <div className="flex items-center justify-between px-6 py-4">
             {/* Mobile Menu Button */}
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={toggleSidebar}
               className="lg:hidden"
+              aria-label="Toggle sidebar"
             >
               <Menu className="h-6 w-6" />
             </button>
 
-            {/* Breadcrumb */}
-            <div className="hidden lg:flex items-center gap-2 text-sm">
-              <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
-                Dashboard
-              </Link>
-              {pathname !== '/dashboard' && (
-                <>
-                  <ChevronRight className="h-4 w-4 text-gray-400" />
-                  <span className="font-medium">
-                    {navItems.find(item => pathname.startsWith(item.href))?.label}
-                  </span>
-                </>
-              )}
-            </div>
+            {/* Breadcrumb - Memoized */}
+            <Breadcrumb pathname={pathname} />
 
             {/* Right Section */}
             <div className="flex items-center gap-4">
