@@ -26,24 +26,25 @@ import { createClient } from '@/lib/supabase/client'
 interface NavItem {
   label: string
   href: string
-  icon: React.ReactNode
+  icon: React.ComponentType<{ className?: string }>
   badge?: string
   adminOnly?: boolean
 }
 
-const navItems: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard', icon: <Home className="h-5 w-5" /> },
-  { label: 'Learning', href: '/dashboard/learning', icon: <BookOpen className="h-5 w-5" />, badge: 'Day 3' },
-  { label: 'Content', href: '/dashboard/content', icon: <FileText className="h-5 w-5" /> },
-  { label: 'Assessment', href: '/dashboard/assessment', icon: <Target className="h-5 w-5" /> },
-  { label: 'Leaderboard', href: '/dashboard/leaderboard', icon: <Trophy className="h-5 w-5" /> },
-  { label: 'Community', href: '/dashboard/community', icon: <Users className="h-5 w-5" /> },
-]
+// Define nav items with icon components (not JSX) to prevent re-creation
+const navItems = [
+  { label: 'Dashboard', href: '/dashboard', icon: Home },
+  { label: 'Learning', href: '/dashboard/learning', icon: BookOpen, badge: 'Day 3' },
+  { label: 'Content', href: '/dashboard/content', icon: FileText },
+  { label: 'Assessment', href: '/dashboard/assessment', icon: Target },
+  { label: 'Leaderboard', href: '/dashboard/leaderboard', icon: Trophy },
+  { label: 'Community', href: '/dashboard/community', icon: Users },
+] as const
 
-const adminNavItems: NavItem[] = [
-  { label: 'Lesson Content', href: '/dashboard/admin/lessons', icon: <BookOpen className="h-5 w-5" />, adminOnly: true },
-  { label: 'AI Quiz Generator', href: '/dashboard/admin/quizzes', icon: <Sparkles className="h-5 w-5" />, adminOnly: true },
-]
+const adminNavItems = [
+  { label: 'Lesson Content', href: '/dashboard/admin/lessons', icon: BookOpen, adminOnly: true },
+  { label: 'AI Quiz Generator', href: '/dashboard/admin/quizzes', icon: Sparkles, adminOnly: true },
+] as const
 
 // Memoized NavItem Component - prevents re-renders when sidebar state changes
 interface NavItemComponentProps {
@@ -54,6 +55,7 @@ interface NavItemComponentProps {
 }
 
 const NavItemComponent = memo(({ item, isActive, activeClassName, inactiveClassName }: NavItemComponentProps) => {
+  const Icon = item.icon
   return (
     <Link
       href={item.href}
@@ -63,7 +65,7 @@ const NavItemComponent = memo(({ item, isActive, activeClassName, inactiveClassN
       }`}
     >
       <div className="flex items-center gap-3">
-        {item.icon}
+        <Icon className="h-5 w-5" />
         <span className="font-medium">{item.label}</span>
       </div>
       {item.badge && (
@@ -90,24 +92,28 @@ interface NavigationListProps {
 }
 
 const NavigationList = memo(({ items, pathname, mounted, activeClassName, inactiveClassName }: NavigationListProps) => {
+  // Calculate isActive for all items once, only when pathname/mounted changes
+  const itemsWithActive = useMemo(() =>
+    items.map((item) => ({
+      item,
+      isActive: mounted && (pathname === item.href ||
+        (item.href !== '/dashboard' && pathname.startsWith(item.href)))
+    })),
+    [items, pathname, mounted]
+  )
+
   return (
     <ul className="space-y-1">
-      {items.map((item) => {
-        // useMemo for each isActive calculation
-        const isActive = mounted && (pathname === item.href ||
-          (item.href !== '/dashboard' && pathname.startsWith(item.href)))
-
-        return (
-          <li key={item.href}>
-            <NavItemComponent
-              item={item}
-              isActive={isActive}
-              activeClassName={activeClassName}
-              inactiveClassName={inactiveClassName}
-            />
-          </li>
-        )
-      })}
+      {itemsWithActive.map(({ item, isActive }) => (
+        <li key={item.href}>
+          <NavItemComponent
+            item={item}
+            isActive={isActive}
+            activeClassName={activeClassName}
+            inactiveClassName={inactiveClassName}
+          />
+        </li>
+      ))}
     </ul>
   )
 })
@@ -156,7 +162,7 @@ const Breadcrumb = memo(({ pathname }: BreadcrumbProps) => {
 
   return (
     <div className="hidden lg:flex items-center gap-2 text-sm">
-      <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
+      <Link href="/dashboard" prefetch={false} className="text-gray-500 hover:text-gray-700">
         Dashboard
       </Link>
       {pathname !== '/dashboard' && currentNavItem && (
@@ -210,7 +216,7 @@ export default function DashboardLayout({
       }`}>
         {/* Logo */}
         <div className="p-6 border-b">
-          <Link href="/dashboard" className="flex items-center gap-3">
+          <Link href="/dashboard" prefetch={false} className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-ggp-primary to-ggp-secondary rounded-lg flex items-center justify-center text-white font-bold text-xl">
               G
             </div>
@@ -252,7 +258,7 @@ export default function DashboardLayout({
             </div>
           </div>
           <div className="mt-2 space-y-1">
-            <Link href="/dashboard/profile" className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+            <Link href="/dashboard/profile" prefetch={false} className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
               <Settings className="h-4 w-4" />
               Profile & Settings
             </Link>
