@@ -59,30 +59,12 @@ export default function DashboardLayout({
     setMounted(true)
   }, [])
 
-  // Fetch user role from database
+  // 임시: 인증 비활성화 상태에서 기본 admin 역할 설정
+  // TODO: 로그인 시스템 활성화 시 원래 코드로 복원
   useEffect(() => {
-    async function fetchUserRole() {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single()
-
-          if (profile?.role) {
-            setUserRole(profile.role)
-          }
-        }
-      } catch (error) {
-        console.error('사용자 역할 가져오기 실패:', error)
-      }
-    }
-
-    fetchUserRole()
+    // 개발 모드: 모든 사용자를 admin으로 설정
+    setUserRole('admin')
+    console.log('🔓 Development Mode: User role set to admin')
   }, [])
 
   return (
@@ -191,8 +173,8 @@ export default function DashboardLayout({
               <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium">John Doe</p>
-              <p className="text-xs text-gray-500">Trainee</p>
+              <p className="text-sm font-medium">테스트 관리자</p>
+              <p className="text-xs text-gray-500">Admin (개발 모드)</p>
             </div>
           </div>
           <div className="mt-2 space-y-1">

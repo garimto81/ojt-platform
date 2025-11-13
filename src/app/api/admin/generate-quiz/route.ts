@@ -124,9 +124,9 @@ Generate ${question_count} quiz questions to test understanding of this lesson c
 - Do not include markdown code blocks, just raw JSON
 `
 
-    // Use Gemini Pro model
+    // Use Gemini 1.5 Flash model (빠르고 효율적)
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-1.5-flash',
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 3000,
