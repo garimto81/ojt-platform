@@ -6,6 +6,7 @@ export type LessonType = 'theory' | 'practical' | 'quiz' | 'video'
 export type ProgressStatus = 'not_started' | 'in_progress' | 'completed' | 'locked'
 export type QuestionType = 'multiple_choice' | 'true_false' | 'short_answer'
 export type ConditionType = 'points' | 'days_completed' | 'perfect_score' | 'speed'
+export type DifficultyLevel = 'easy' | 'medium' | 'hard'
 
 // ============================================
 // Database Tables
@@ -51,6 +52,13 @@ export interface Lesson {
   resources: LessonResources | null
   created_at: string
   updated_at: string
+  // AI features
+  raw_content: string | null
+  learning_objectives: string[] | null
+  key_concepts: string[] | null
+  difficulty_level: DifficultyLevel | null
+  ai_processed: boolean
+  ai_processed_at: string | null
 }
 
 export interface LessonResources {
@@ -84,6 +92,12 @@ export interface Quiz {
   order_index: number
   created_at: string
   updated_at: string
+  // AI features
+  difficulty: DifficultyLevel | null
+  concept_tags: string[] | null
+  ai_generated: boolean
+  generation_seed: string | null
+  is_active: boolean
 }
 
 export interface QuizOption {
@@ -101,6 +115,26 @@ export interface QuizAttempt {
   points_earned: number
   attempted_at: string
   feedback: string | null
+}
+
+export interface QuizPool {
+  id: string // UUID
+  lesson_id: string // UUID
+  pool_size: number
+  difficulty_distribution: Record<string, any> | null
+  active_count: number
+  created_at: string
+  updated_at: string
+}
+
+export interface UserQuizHistory {
+  id: string // UUID
+  user_id: string // UUID
+  lesson_id: string // UUID
+  quiz_id: string // UUID
+  attempt_number: number
+  is_correct: boolean
+  attempted_at: string
 }
 
 export interface Achievement {
@@ -281,6 +315,16 @@ export interface Database {
         Insert: Omit<QuizAttempt, 'id' | 'attempted_at'>
         Update: Partial<Omit<QuizAttempt, 'id' | 'attempted_at'>>
       }
+      quiz_pools: {
+        Row: QuizPool
+        Insert: Omit<QuizPool, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<QuizPool, 'id' | 'created_at' | 'updated_at'>>
+      }
+      user_quiz_history: {
+        Row: UserQuizHistory
+        Insert: Omit<UserQuizHistory, 'id' | 'attempted_at'>
+        Update: Partial<Omit<UserQuizHistory, 'id' | 'attempted_at'>>
+      }
       achievements: {
         Row: Achievement
         Insert: Omit<Achievement, 'id' | 'created_at'>
@@ -298,6 +342,7 @@ export interface Database {
       progress_status: ProgressStatus
       question_type: QuestionType
       condition_type: ConditionType
+      difficulty_level: DifficultyLevel
     }
   }
 }
