@@ -10,6 +10,9 @@
  *   "check-env": "node scripts/check-env.js"
  */
 
+// Load .env.local file
+require('dotenv').config({ path: '.env.local' })
+
 const requiredEnvVars = [
   {
     name: 'NEXT_PUBLIC_SUPABASE_URL',
