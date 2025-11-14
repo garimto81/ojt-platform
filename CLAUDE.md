@@ -5,8 +5,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Repository**: GG Production Knowledge Platform - Professional Poker Training Platform
 **Framework**: Next.js 14 with App Router
 **Database**: Supabase (PostgreSQL)
-**AI Integration**: Google Gemini API
+**AI Integration**: Google Gemini API (gemini-1.5-flash)
 **PRD**: [tasks/prds/0001-prd-ai-powered-learning-platform.md](tasks/prds/0001-prd-ai-powered-learning-platform.md)
+
+---
+
+## ⚠️ 현재 개발 상태 (Current Development Status)
+
+**중요**: 이 프로젝트는 현재 개발 중이며, 일부 기능이 임시로 비활성화되어 있습니다.
+
+### 인증 시스템 비활성화
+- **상태**: `src/middleware.ts`에서 인증이 **완전히 비활성화** 상태
+- **영향**: 모든 라우트가 인증 없이 접근 가능 (보안 취약)
+- **이유**: 개발 편의성을 위한 임시 조치
+- **위치**: `src/middleware.ts:7-12`
+- **TODO**: 프로덕션 배포 전 반드시 인증 재활성화 필요
+
+```typescript
+// 현재 상태 (임시)
+export async function middleware(request: NextRequest) {
+  console.log('🔓 Middleware - Authentication DISABLED (development mode)')
+  return NextResponse.next() // 모든 요청 허용
+}
+```
+
+**프로덕션 배포 전 필수 작업**:
+- [ ] middleware.ts에서 Supabase 인증 체크 재활성화
+- [ ] 보호된 라우트 (/dashboard/*) 접근 제어
+- [ ] 역할 기반 접근 제어 (admin/trainer) 재적용
 
 ---
 
@@ -64,9 +90,19 @@ npm run build                  # Production build (runs check-env prebuild)
 npm start                      # Start production server
 npm run lint                   # Run ESLint
 
-# Testing
+# Testing - Unit Tests (Jest)
 npm test                       # Run Jest in watch mode
 npm run test:ci                # Run Jest in CI mode (no watch)
+
+# Testing - E2E Tests (Playwright)
+npm run test:e2e               # Run all E2E tests (auto-starts dev server on port 3001)
+npm run test:e2e:ui            # Run tests with Playwright UI (interactive)
+npm run test:e2e:headed        # Run tests in headed mode (visible browser)
+npm run test:e2e:debug         # Run tests in debug mode (step-by-step)
+npm run test:e2e:chromium      # Run tests in Chromium only
+npm run test:e2e:firefox       # Run tests in Firefox only
+npm run test:e2e:webkit        # Run tests in WebKit (Safari) only
+npm run test:e2e:report        # Show HTML test results report
 
 # Environment Setup
 npm run check-env              # Validate environment variables
@@ -155,6 +191,55 @@ Next.js App Router (SSR + Client Components)
 - Automatic point accumulation via database triggers
 - Leaderboard system with historical snapshots
 - Achievement badges (condition-based)
+
+---
+
+## Testing Strategy
+
+### Unit Testing (Jest)
+- **Framework**: Jest with @testing-library/react
+- **Location**: `tests/` directory (unit tests)
+- **Config**: `jest.config.js` (현재 프로젝트에는 없음, 필요시 추가)
+- **Coverage**: `--cov` 플래그로 커버리지 리포트 생성 가능
+
+```bash
+npm test           # Watch mode (개발 중 사용)
+npm run test:ci    # CI mode (자동화 파이프라인용)
+```
+
+### E2E Testing (Playwright)
+- **Framework**: Playwright Test
+- **Location**: `tests/e2e/` directory
+- **Config**: `playwright.config.ts`
+- **Browsers**: Chromium, Firefox, WebKit 모두 지원
+- **Auto Server**: 테스트 실행 시 자동으로 dev 서버 시작 (port 3001)
+
+**주요 설정**:
+- **Timeout**: 30초 (테스트 전체), 5초 (expect)
+- **Retry**: CI에서 2회, 로컬에서 0회
+- **Screenshots**: 실패 시 자동 캡처
+- **Videos**: 실패 시 녹화 저장
+- **Trace**: 첫 번째 재시도 시 수집 (디버깅용)
+
+**유용한 명령어**:
+```bash
+# UI 모드로 테스트 개발 (가장 추천)
+npm run test:e2e:ui
+
+# 특정 브라우저만 테스트
+npm run test:e2e:chromium
+
+# 디버그 모드 (breakpoint 사용 가능)
+npm run test:e2e:debug
+
+# 결과 리포트 보기
+npm run test:e2e:report
+```
+
+**테스트 작성 팁**:
+- 인증이 비활성화되어 있으므로 로그인 테스트 불필요 (현재)
+- `baseURL`은 `http://localhost:3001`로 설정됨
+- 로케일은 `ko-KR`, 타임존은 `Asia/Seoul`
 
 ---
 
@@ -394,9 +479,11 @@ Supabase Dashboard → Authentication → URL Configuration
 - **Row Level Security**: Database-level authorization
 
 ### AI
-- **Google Gemini**: `@google/generative-ai` library
-- **Model**: Uses Gemini Pro for quiz generation
-- **JSON Output**: Structured responses parsed into quiz format
+- **Google Gemini**: `@google/generative-ai` library (v0.24.1)
+- **Model**: `gemini-1.5-flash` (빠르고 효율적인 모델)
+- **Note**: README에 OpenAI GPT-4o 언급이 있지만, 실제 구현은 Google Gemini 사용
+- **JSON Output**: `responseMimeType: 'application/json'`으로 구조화된 응답 보장
+- **Lazy Initialization**: GEMINI_API_KEY는 퀴즈 생성 API 호출 시에만 검증 (선택적 기능)
 
 ---
 
@@ -430,5 +517,19 @@ Supabase Dashboard → Authentication → URL Configuration
 
 ---
 
-**Last Updated**: 2025-01-13
-**Version**: 1.0.0
+## Version History
+
+- **v1.1.0** (2025-01-14)
+  - 현재 개발 상태 섹션 추가 (인증 비활성화 상태 명시)
+  - E2E 테스트 (Playwright) 명령어 및 상세 가이드 추가
+  - AI 통합 섹션 명확화 (Gemini 1.5 Flash 사용 명시)
+  - Testing Strategy 섹션 추가
+
+- **v1.0.0** (2025-01-13)
+  - 초기 CLAUDE.md 작성
+  - 기본 아키텍처 및 개발 가이드 문서화
+
+---
+
+**Last Updated**: 2025-01-14
+**Version**: 1.1.0
