@@ -9,11 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.3.0] - 2025-01-17
+
 ### Added
-- PRD v3.0.0: Realistic goals, AI quality system, SRS algorithm
-- 5 new database tables for AI quality & cost tracking
-- Comprehensive folder reorganization plan
-- Phase validation scripts (Phase 0-6)
+- **PRD v3.0.0**: Realistic goals, AI quality system, SRS algorithm [#12]
+- **6 new database migrations** for PRD v3.0.0:
+  - 005: lesson_versions (Content version control)
+  - 006: user_question_history (SRS quiz algorithm - SuperMemo SM-2)
+  - 007: ai_processing_logs (AI cost tracking & debugging)
+  - 008: content_metrics (Measurable success indicators)
+  - 009: poker_glossary (Domain terminology validation)
+  - 010: ai_confidence_score (AI quality assurance)
+- **Documentation structure** reorganization [#12]
+  - docs/ organized into 6 categories (setup, deployment, development, testing, architecture, reference)
+  - 4 new README files (docs/, scripts/, tasks/, root CHANGELOG.md)
+  - Complete documentation navigation guide
+- **Scripts reorganization** by language (node, bash, python, typescript)
+- **Tasks folder structure** for Phase 0-6 workflow
+
+### Changed
+- **Folder structure**: Moved 23 root MD files to categorized docs/ subfolders
+- **package.json scripts**: Updated paths to reflect new folder structure
+- **README.md**: Updated all documentation links
+
+### Removed
+- Duplicate test folder (testse2e/)
+
+### Improved
+- Documentation discoverability (91% reduction in root clutter)
+- Script organization (language-specific folders)
+- Version tracking (CHANGELOG.md introduced)
 
 ---
 

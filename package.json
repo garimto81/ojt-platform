@@ -1,6 +1,6 @@
 {
   "name": "ggp-platform",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -18,12 +18,12 @@
     "test:e2e:webkit": "playwright test --project=webkit",
     "test:e2e:report": "playwright show-report",
     "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts",
-    "check-env": "node scripts/check-env.js",
-    "prebuild": "node scripts/check-env.js",
-    "setup:supabase": "node scripts/get-supabase-config.js",
-    "setup:vercel": "node scripts/setup-vercel-env.js",
-    "create-pr": "bash scripts/create-pr-api.sh",
-    "create-deployment-issue": "bash scripts/create-deployment-issue.sh"
+    "check-env": "node scripts/node/check-env.js",
+    "prebuild": "node scripts/node/check-env.js",
+    "setup:supabase": "node scripts/node/get-supabase-config.js",
+    "setup:vercel": "node scripts/node/setup-vercel-env.js",
+    "create-pr": "bash scripts/bash/create-pr-api.sh",
+    "create-deployment-issue": "bash scripts/bash/create-deployment-issue.sh"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
