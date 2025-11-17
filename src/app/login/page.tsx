@@ -36,7 +36,8 @@ export default function LoginPage() {
 
       if (error) throw error
 
-      router.push('/dashboard')
+      // 전체 페이지 리로드로 쿠키 즉시 반영
+      window.location.href = '/dashboard'
     } catch (err: any) {
       setError(err.message || 'An error occurred during login')
     } finally {
