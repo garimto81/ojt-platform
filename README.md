@@ -105,7 +105,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) 🎉
 
-📖 **빠른 시작 가이드**: [QUICK_SETUP_GUIDE.md](./docs/setup/QUICK_SETUP_GUIDE.md)
+📖 **빠른 시작 가이드**: [QUICK_START.md](./QUICK_START.md)
 
 ---
 
@@ -203,7 +203,7 @@ ggp-platform/
 
 ## 🚀 Deployment
 
-See [DEPLOYMENT.md](./docs/deployment/DEPLOYMENT.md) for detailed deployment instructions.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 
 ### Quick Deploy to Vercel
 
@@ -294,38 +294,36 @@ git push origin main
 
 #### 🔧 수동 설정
 
-1. **환경 변수 설정 가이드 확인**
-   ```bash
-   # 상세한 가이드 문서
-   cat docs/deployment/VERCEL_DEPLOYMENT_GUIDE.md
-   ```
-
-2. **Vercel에 환경 변수 추가**
+1. **Vercel에 환경 변수 추가**
    - Vercel 대시보드 → Settings → Environment Variables
    - 모든 필수 환경 변수 추가
 
-3. **Supabase 리디렉션 URL 설정**
+2. **Supabase 리디렉션 URL 설정**
    - Supabase → Authentication → URL Configuration
    - Vercel 도메인을 Redirect URLs에 추가
 
-4. **배포**
+3. **배포**
    ```bash
    git push origin main
    # 또는 Vercel CLI 사용
    vercel deploy --prod
    ```
 
-📖 **상세 가이드**:
-- [QUICK_SETUP_GUIDE.md](./docs/setup/QUICK_SETUP_GUIDE.md) - CLI 자동화 스크립트
-- [VERCEL_DEPLOYMENT_GUIDE.md](./docs/deployment/VERCEL_DEPLOYMENT_GUIDE.md) - 완전 가이드
-- [📚 전체 문서 목록](./docs/README.md) - 모든 문서 네비게이션
+📖 **상세 가이드**: [DEPLOYMENT.md](./DEPLOYMENT.md) - 완전한 배포 가이드
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines including:
 
+- Development environment setup
+- Code style and conventions
+- Pull request process
+- Testing requirements
+- Commit message rules
+
+Quick start:
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
@@ -366,7 +364,23 @@ GG Production is a leading poker training organization dedicated to developing p
 
 ## 📚 Documentation
 
-- [📖 Complete Documentation](./docs/README.md) - All guides organized by category
-- [🎯 PRD v3.0.0](./tasks/prds/0001-prd-ai-powered-learning-platform.md) - Product Requirements
-- [📋 CHANGELOG](./CHANGELOG.md) - Version history
-- [🔧 CLAUDE.md](./CLAUDE.md) - Development guide for Claude Code
+### 🚀 Quick Start & Setup
+- [QUICK_START.md](./QUICK_START.md) - 20-minute setup guide
+- [.env.example](./.env.example) - Environment variable template
+
+### 💻 Development
+- [DEVELOPMENT.md](./DEVELOPMENT.md) - Development workflow, migrations, PR automation
+- [CLAUDE.md](./CLAUDE.md) - Development guide for Claude Code
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Contribution guidelines
+
+### 🚀 Deployment & Testing
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Vercel deployment guide
+- [TESTING.md](./TESTING.md) - Unit, E2E, performance testing
+
+### 🆘 Troubleshooting & Reference
+- [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Common issues and solutions
+- [CHANGELOG.md](./CHANGELOG.md) - Version history
+- [PRD v3.0.0](./tasks/prds/0001-prd-ai-powered-learning-platform.md) - Product Requirements
+
+### 📂 Archive
+- [docs/archive/](./docs/archive/) - Legacy documentation (organized by category)
