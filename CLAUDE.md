@@ -12,27 +12,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## ⚠️ 현재 개발 상태 (Current Development Status)
 
-**중요**: 이 프로젝트는 현재 개발 중이며, 일부 기능이 임시로 비활성화되어 있습니다.
+**중요**: 이 프로젝트는 현재 개발 중입니다.
 
-### 인증 시스템 비활성화
-- **상태**: `src/middleware.ts`에서 인증이 **완전히 비활성화** 상태
-- **영향**: 모든 라우트가 인증 없이 접근 가능 (보안 취약)
-- **이유**: 개발 편의성을 위한 임시 조치
-- **위치**: `src/middleware.ts:7-12`
-- **TODO**: 프로덕션 배포 전 반드시 인증 재활성화 필요
+### 인증 시스템 상태
+- **상태**: `src/middleware.ts`에서 인증이 **정상 작동** 중
+- **보호된 라우트**: `/dashboard/*` - 인증 필요
+- **역할 기반 접근**: `/dashboard/admin/*` - admin/trainer만 접근 가능
+- **위치**: `src/middleware.ts:11-104`
 
-```typescript
-// 현재 상태 (임시)
-export async function middleware(request: NextRequest) {
-  console.log('🔓 Middleware - Authentication DISABLED (development mode)')
-  return NextResponse.next() // 모든 요청 허용
-}
-```
-
-**프로덕션 배포 전 필수 작업**:
-- [ ] middleware.ts에서 Supabase 인증 체크 재활성화
-- [ ] 보호된 라우트 (/dashboard/*) 접근 제어
-- [ ] 역할 기반 접근 제어 (admin/trainer) 재적용
+**인증 흐름**:
+1. Public routes (`/`, `/login`, `/register`) - 인증 불필요
+2. Protected routes (`/dashboard/*`) - 로그인 필수, 미인증 시 `/login`으로 리다이렉트
+3. Admin routes (`/dashboard/admin/*`) - admin 또는 trainer 역할 필수
+4. 인증된 사용자가 로그인 페이지 접근 시 `/dashboard`로 자동 리다이렉트
 
 ### 🚨 더미 Supabase 설정 (Critical Issue)
 
@@ -262,11 +254,13 @@ npm run test:ci    # CI mode (자동화 파이프라인용)
 - **Auto Server**: 테스트 실행 시 자동으로 dev 서버 시작 (port 3001)
 
 **주요 설정**:
-- **Timeout**: 30초 (테스트 전체), 5초 (expect)
+- **Timeout**: 30초 (테스트 전체), 5초 (expect), 10초 (navigation)
 - **Retry**: CI에서 2회, 로컬에서 0회
-- **Screenshots**: 실패 시 자동 캡처
+- **Screenshots**: 실패 시 자동 캡처 (`test-results/` 디렉토리)
 - **Videos**: 실패 시 녹화 저장
 - **Trace**: 첫 번째 재시도 시 수집 (디버깅용)
+- **Viewport**: 1280x720 (Desktop)
+- **CORS**: Chromium에서 CORS 비활성화 (`--disable-web-security`)
 
 **유용한 명령어**:
 ```bash
@@ -275,18 +269,24 @@ npm run test:e2e:ui
 
 # 특정 브라우저만 테스트
 npm run test:e2e:chromium
+npm run test:e2e:firefox
+npm run test:e2e:webkit
 
 # 디버그 모드 (breakpoint 사용 가능)
 npm run test:e2e:debug
 
-# 결과 리포트 보기
+# Headed 모드 (브라우저 보면서 실행)
+npm run test:e2e:headed
+
+# 결과 리포트 보기 (HTML 형식)
 npm run test:e2e:report
 ```
 
 **테스트 작성 팁**:
-- 인증이 비활성화되어 있으므로 로그인 테스트 불필요 (현재)
-- `baseURL`은 `http://localhost:3001`로 설정됨
+- 인증이 활성화되어 있으므로 로그인 테스트 작성 시 실제 Supabase 설정 필요
+- `baseURL`은 `http://localhost:3001`로 설정됨 (dev 서버와 분리)
 - 로케일은 `ko-KR`, 타임존은 `Asia/Seoul`
+- 테스트 결과는 `playwright-report/` (HTML), `test-results/` (스크린샷/비디오)
 
 ---
 
@@ -354,13 +354,36 @@ src/
 └── middleware.ts                   # Route protection
 
 supabase/migrations/
-├── 001_initial_schema.sql          # Main schema
-├── 002_seed_data.sql               # Sample curriculum
-└── 003_sample_lesson_content.sql   # Lesson content
+├── 001_initial_schema.sql          # Main schema (profiles, curriculum, lessons, quizzes)
+├── 002_seed_data.sql               # Sample curriculum (7 days)
+├── 003_sample_lesson_content.sql   # Lesson content examples
+├── 004_ai_features_schema.sql      # AI processing tables (quiz_pools, etc.)
+├── 005_lesson_versions.sql         # Lesson versioning system
+├── 006_user_question_history.sql   # User question tracking
+├── 007_ai_processing_logs.sql      # AI operation logging
+├── 008_content_metrics.sql         # Content analytics
+├── 009_poker_glossary.sql          # Poker terminology database
+└── 010_ai_confidence_score.sql     # AI confidence tracking
 ```
 
 ### Path Aliases
 - `@/*` → `./src/*` (configured in `tsconfig.json`)
+
+### Migration Management
+**Apply migrations to production**:
+```bash
+cd supabase
+supabase login
+supabase link --project-ref [YOUR-PROJECT-REF]
+supabase db push
+```
+
+**Reset local database** (development only):
+```bash
+supabase db reset
+```
+
+**Note**: Migrations are applied sequentially by number (001, 002, etc.)
 
 ---
 
@@ -566,8 +589,14 @@ Supabase Dashboard → Authentication → URL Configuration
 
 ## Version History
 
+- **v1.2.0** (2025-01-17)
+  - 인증 시스템 상태 정확성 개선 (실제로는 정상 작동 중)
+  - Playwright E2E 테스트 설정 상세화 (타임아웃, 출력 디렉토리 등)
+  - 마이그레이션 파일 목록 추가 (001-010)
+  - 마이그레이션 관리 명령어 추가
+
 - **v1.1.0** (2025-01-14)
-  - 현재 개발 상태 섹션 추가 (인증 비활성화 상태 명시)
+  - 현재 개발 상태 섹션 추가
   - E2E 테스트 (Playwright) 명령어 및 상세 가이드 추가
   - AI 통합 섹션 명확화 (Gemini 1.5 Flash 사용 명시)
   - Testing Strategy 섹션 추가
@@ -578,5 +607,5 @@ Supabase Dashboard → Authentication → URL Configuration
 
 ---
 
-**Last Updated**: 2025-01-14
-**Version**: 1.1.0
+**Last Updated**: 2025-01-17
+**Version**: 1.2.0
