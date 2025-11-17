@@ -137,6 +137,6 @@ $$ LANGUAGE plpgsql;
 COMMENT ON TABLE ai_processing_logs IS 'AI processing logs with cost tracking (PRD v3.0.0)';
 COMMENT ON COLUMN ai_processing_logs.cost_usd IS 'API cost in USD';
 COMMENT ON COLUMN ai_processing_logs.confidence_score IS 'AI confidence score (0-100)';
-COMMENT ON VIEW ai_cost_analytics IS 'Daily AI cost and performance analytics';
+COMMENT ON MATERIALIZED VIEW ai_cost_analytics IS 'Daily AI cost and performance analytics';
 COMMENT ON FUNCTION get_daily_ai_cost IS 'Get daily AI costs for last 30 days';
 COMMENT ON FUNCTION check_daily_budget_alert IS 'Check if daily budget limit exceeded';
