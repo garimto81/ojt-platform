@@ -124,7 +124,6 @@ SET
 
 ## 다음 단계
 다음 레슨에서는 포지션의 중요성과 프리플랍 전략을 배웁니다.',
-  description = '텍사스 홀덤의 기본 규칙, 핸드 랭킹, 게임 진행 순서를 학습합니다.',
   updated_at = now()
 WHERE title = 'Poker Basics' AND day_id = (SELECT id FROM public.curriculum_days WHERE day_number = 1 LIMIT 1);
 
@@ -233,7 +232,6 @@ SET
 
 ## 다음 단계
 다음 레슨에서는 프리플랍 전략과 핸드 레인지를 상세히 다룹니다.',
-  description = '포지션의 중요성과 각 포지션별 전략을 학습합니다.',
   updated_at = now()
 WHERE title = 'Position Importance' AND day_id = (SELECT id FROM public.curriculum_days WHERE day_number = 1 LIMIT 1);
 
@@ -374,7 +372,6 @@ SET
 
 ## 다음 단계
 다음 레슨에서는 블러핑 기법과 핸드 리딩을 배웁니다.',
-  description = '팟 오즈 계산과 베팅 사이즈 결정 방법을 학습합니다.',
   updated_at = now()
 WHERE title = 'Betting & Pot Odds' AND day_id = (SELECT id FROM public.curriculum_days WHERE day_number = 2 LIMIT 1);
 
@@ -569,7 +566,6 @@ SET
 
 ## 다음 단계
 다음 레슨에서는 토너먼트 전략과 ICM을 다룹니다.',
-  description = '블러핑 기법과 상대의 핸드를 읽는 방법을 학습합니다.',
   updated_at = now()
 WHERE title = 'Bluffing & Hand Reading' AND day_id = (SELECT id FROM public.curriculum_days WHERE day_number = 3 LIMIT 1);
 
@@ -577,27 +573,23 @@ WHERE title = 'Bluffing & Hand Reading' AND day_id = (SELECT id FROM public.curr
 UPDATE public.lessons
 SET
   content = '# 토너먼트 전략 기초\n\n## ICM 이해\n- Independent Chip Model 개념\n- 스택 크기별 전략\n- 버블 플레이\n\n## 토너먼트 단계별 전략\n1. 초기 단계\n2. 중반 단계\n3. 버블 직전\n4. ITM (In The Money)\n5. 파이널 테이블',
-  description = '토너먼트 포커의 기본 전략과 ICM 개념을 학습합니다.',
   updated_at = now()
 WHERE day_id = (SELECT id FROM public.curriculum_days WHERE day_number = 4 LIMIT 1) AND order_index = 1;
 
 UPDATE public.lessons
 SET
   content = '# 캐시 게임 전략\n\n## 캐시 게임 vs 토너먼트\n- 차이점 이해\n- 스택 관리\n- 테이블 선택\n\n## 최적 플레이\n1. 포지션 활용\n2. 3-bet/4-bet 전략\n3. 멀티웨이 팟\n4. 스택 깊이별 조정',
-  description = '캐시 게임의 기본 전략과 최적 플레이 방법을 학습합니다.',
   updated_at = now()
 WHERE day_id = (SELECT id FROM public.curriculum_days WHERE day_number = 5 LIMIT 1) AND order_index = 1;
 
 UPDATE public.lessons
 SET
   content = '# 포커 소프트웨어 활용\n\n## 필수 도구\n1. HUD (Heads-Up Display)\n2. 트래커 소프트웨어\n3. 에퀴티 계산기\n\n## 데이터 분석\n- 통계 읽는 법\n- 리크 찾기\n- 개선 포인트 도출',
-  description = '포커 소프트웨어와 데이터 분석 도구 활용법을 학습합니다.',
   updated_at = now()
 WHERE day_id = (SELECT id FROM public.curriculum_days WHERE day_number = 6 LIMIT 1) AND order_index = 1;
 
 UPDATE public.lessons
 SET
   content = '# 포커 프로로의 여정\n\n## 멘탈 게임\n1. 틸트 관리\n2. 뱅크롤 관리\n3. 스트레스 대처\n\n## 지속적 학습\n- 핸드 리뷰\n- 포럼 참여\n- 코칭 받기\n\n## 커리어 로드맵\n- 단계별 목표\n- 수익 관리\n- 프로의 마인드셋',
-  description = '프로 포커 플레이어가 되기 위한 멘탈과 커리어 관리를 학습합니다.',
   updated_at = now()
 WHERE day_id = (SELECT id FROM public.curriculum_days WHERE day_number = 7 LIMIT 1) AND order_index = 1;
