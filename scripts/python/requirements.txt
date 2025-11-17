@@ -1,0 +1,4 @@
+# Python dependencies for scripts
+
+# Google Gemini API for AI task generation
+google-generativeai>=0.3.0

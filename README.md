@@ -105,7 +105,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) 🎉
 
-📖 **빠른 시작 가이드**: [QUICK_SETUP_GUIDE.md](./QUICK_SETUP_GUIDE.md)
+📖 **빠른 시작 가이드**: [QUICK_SETUP_GUIDE.md](./docs/setup/QUICK_SETUP_GUIDE.md)
 
 ---
 
@@ -203,7 +203,7 @@ ggp-platform/
 
 ## 🚀 Deployment
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
+See [DEPLOYMENT.md](./docs/deployment/DEPLOYMENT.md) for detailed deployment instructions.
 
 ### Quick Deploy to Vercel
 
@@ -297,7 +297,7 @@ git push origin main
 1. **환경 변수 설정 가이드 확인**
    ```bash
    # 상세한 가이드 문서
-   cat VERCEL_DEPLOYMENT_GUIDE.md
+   cat docs/deployment/VERCEL_DEPLOYMENT_GUIDE.md
    ```
 
 2. **Vercel에 환경 변수 추가**
@@ -316,8 +316,9 @@ git push origin main
    ```
 
 📖 **상세 가이드**:
-- [QUICK_SETUP_GUIDE.md](./QUICK_SETUP_GUIDE.md) - CLI 자동화 스크립트
-- [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md) - 완전 가이드
+- [QUICK_SETUP_GUIDE.md](./docs/setup/QUICK_SETUP_GUIDE.md) - CLI 자동화 스크립트
+- [VERCEL_DEPLOYMENT_GUIDE.md](./docs/deployment/VERCEL_DEPLOYMENT_GUIDE.md) - 완전 가이드
+- [📚 전체 문서 목록](./docs/README.md) - 모든 문서 네비게이션
 
 ---
 
@@ -359,4 +360,13 @@ GG Production is a leading poker training organization dedicated to developing p
 
 **Built with ❤️ by the GG Production Team**
 
-**Version**: 1.0.0 | **Status**: Production Ready | **Last Updated**: 2024-11-06
+**Version**: 0.2.1 | **Status**: Active Development | **Last Updated**: 2025-01-17
+
+---
+
+## 📚 Documentation
+
+- [📖 Complete Documentation](./docs/README.md) - All guides organized by category
+- [🎯 PRD v3.0.0](./tasks/prds/0001-prd-ai-powered-learning-platform.md) - Product Requirements
+- [📋 CHANGELOG](./CHANGELOG.md) - Version history
+- [🔧 CLAUDE.md](./CLAUDE.md) - Development guide for Claude Code
