@@ -34,7 +34,7 @@ export async function GET(request: Request) {
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data: authData, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
       console.error('Error exchanging code for session:', error)
@@ -49,6 +49,42 @@ export async function GET(request: Request) {
         error.message || '인증에 실패했습니다'
       )
       return NextResponse.redirect(`${origin}/login?error=${errorMessage}`)
+    }
+
+    // Google OAuth 사용자의 경우 프로필이 없으면 생성
+    if (authData?.user) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', authData.user.id)
+        .single()
+
+      // 프로필이 없으면 생성
+      if (profileError || !profile) {
+        console.log('Creating profile for OAuth user:', authData.user.id)
+
+        const fullName = authData.user.user_metadata?.full_name ||
+                         authData.user.user_metadata?.name ||
+                         authData.user.user_metadata?.given_name ||
+                         authData.user.email?.split('@')[0]
+
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: authData.user.email!,
+            full_name: fullName,
+            avatar_url: authData.user.user_metadata?.avatar_url,
+            role: 'trainee',
+          })
+
+        if (insertError) {
+          console.error('Error creating profile:', insertError)
+          // 프로필 생성 실패해도 로그인은 성공으로 처리 (나중에 수동 생성 가능)
+        } else {
+          console.log('Profile created successfully for OAuth user')
+        }
+      }
     }
 
     // 성공 시: 모든 쿠키를 response에 복사
