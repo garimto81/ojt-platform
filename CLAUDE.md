@@ -34,6 +34,53 @@ export async function middleware(request: NextRequest) {
 - [ ] 보호된 라우트 (/dashboard/*) 접근 제어
 - [ ] 역할 기반 접근 제어 (admin/trainer) 재적용
 
+### 🚨 더미 Supabase 설정 (Critical Issue)
+
+**문제**: `.env.local`에 더미(가짜) Supabase 설정이 포함되어 있습니다.
+
+```bash
+# ❌ 현재 설정 (작동하지 않음)
+NEXT_PUBLIC_SUPABASE_URL=https://dummy.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...dummy
+```
+
+**증상**:
+- ❌ 로그인 시도 시 "Failed to fetch" 에러
+- ❌ 회원가입 불가
+- ❌ 모든 인증 기능 작동하지 않음
+
+**해결 방법**:
+
+1. **Supabase 프로젝트 생성** (아직 없는 경우):
+   ```bash
+   # 1. https://supabase.com 접속
+   # 2. "New Project" 클릭
+   # 3. 프로젝트 생성 (무료)
+   # 4. Settings → API에서 URL과 Key 복사
+   ```
+
+2. **실제 설정으로 교체**:
+   ```bash
+   # .env.local 편집
+   NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ실제_키_내용...
+   SUPABASE_SERVICE_ROLE_KEY=eyJ서비스_롤_키...
+   ```
+
+3. **개발 서버 재시작**:
+   ```bash
+   npm run dev
+   ```
+
+**자동 설정 도구 사용** (권장):
+```bash
+npm run setup:supabase
+# → 대화형으로 Supabase URL과 Key 입력
+# → .env.local 자동 생성
+```
+
+**중요**: 더미 설정으로는 어떤 기능도 작동하지 않습니다. 실제 Supabase 프로젝트 설정이 필수입니다.
+
 ---
 
 ## 🎯 핵심 AI 기능 (Core AI Features)

@@ -61,6 +61,10 @@ A comprehensive learning management system built for GG Production's poker train
 
 ### Quick Start
 
+> **⚠️ 중요**: 현재 `.env.local`에 더미(가짜) Supabase 설정이 있습니다.
+> 로그인/회원가입이 작동하지 않으므로 **실제 Supabase 프로젝트**를 생성하고 설정해야 합니다.
+> 아래 "방법 1"의 `npm run setup:supabase`를 사용하거나 [Supabase](https://supabase.com)에서 프로젝트를 생성하세요.
+
 #### 방법 1: 자동 설정 (권장) ⚡
 
 ```bash

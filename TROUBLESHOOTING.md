@@ -218,6 +218,75 @@ WHERE email = 'user@example.com';
 
 ## 🔐 인증 문제
 
+### ❌ "Failed to fetch" (로그인/회원가입 불가) 🚨
+
+**증상**:
+```
+Failed to fetch
+TypeError: Failed to fetch
+Network request failed
+```
+
+**로그인 또는 회원가입 시도 시 위 에러 발생**
+
+**원인**: `.env.local`에 더미(가짜) Supabase 설정이 있음
+
+**확인**:
+```bash
+cat .env.local | grep SUPABASE_URL
+# 결과가 https://dummy.supabase.co 라면 문제!
+```
+
+**해결 방법**:
+
+**방법 1: 자동 설정 도구 사용** (가장 빠름 ⚡):
+```bash
+npm run setup:supabase
+# → Supabase URL 입력
+# → Supabase Anon Key 입력
+# → .env.local 자동 생성
+npm run dev  # 서버 재시작
+```
+
+**방법 2: 수동 설정**:
+
+1. **Supabase 프로젝트 생성** (아직 없는 경우):
+   - https://supabase.com 접속
+   - "New Project" 클릭
+   - 프로젝트 이름 입력 후 생성 (무료)
+   - 프로젝트 생성 완료까지 대기 (1-2분)
+
+2. **API 키 복사**:
+   ```
+   Supabase Dashboard → Settings → API
+   → URL: https://xxxx.supabase.co 복사
+   → anon public: eyJhbGci... 복사
+   → service_role: eyJhbGci... 복사 (선택)
+   ```
+
+3. **.env.local 편집**:
+   ```bash
+   # 기존 더미 설정 삭제 후 실제 값으로 교체
+   NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ실제_anon_키...
+   SUPABASE_SERVICE_ROLE_KEY=eyJ실제_service_role_키...
+   ```
+
+4. **서버 재시작**:
+   ```bash
+   # 기존 서버 종료 (Ctrl+C)
+   npm run dev
+   ```
+
+5. **확인**:
+   - http://localhost:3000/login 접속
+   - 회원가입 시도
+   - "Failed to fetch" 에러가 사라지면 성공!
+
+**중요**: 더미 Supabase 설정으로는 인증이 절대 작동하지 않습니다.
+
+---
+
 ### ❌ 무한 리다이렉트 루프
 
 **증상**:
