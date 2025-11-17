@@ -1,83 +1,143 @@
-# 문서 네비게이션 (Documentation Navigation)
+# 📚 문서 안내 (Documentation Guide)
 
-ojt-platform 프로젝트의 모든 문서를 쉽게 찾을 수 있도록 정리한 가이드입니다.
+GG Production 학습 플랫폼의 모든 문서를 쉽게 찾을 수 있도록 정리한 가이드입니다.
 
 ---
 
-## 📚 문서 카테고리
+## 🚀 빠른 시작
 
-### 🔧 setup/ - 환경 설정
-프로젝트 초기 설정 및 환경 구성 가이드
+프로젝트를 처음 시작하시나요? 아래 문서를 순서대로 읽어보세요:
 
-- [QUICK_START.md](setup/QUICK_START.md) - 빠른 시작 가이드
-- [QUICK_SETUP_GUIDE.md](setup/QUICK_SETUP_GUIDE.md) - 간편 설정 가이드
-- [DATABASE_SETUP.md](setup/DATABASE_SETUP.md) - 데이터베이스 설정
-- [SUPABASE_SETUP.md](setup/SUPABASE_SETUP.md) - Supabase 설정
-- [GOOGLE_AUTH_SETUP.md](setup/GOOGLE_AUTH_SETUP.md) - Google OAuth 설정
-- [EMAIL_VERIFICATION_GUIDE.md](setup/EMAIL_VERIFICATION_GUIDE.md) - 이메일 인증 설정
+1. [QUICK_START.md](../QUICK_START.md) - 20분 빠른 시작 가이드
+2. [DEVELOPMENT.md](../DEVELOPMENT.md) - 개발 워크플로우 이해하기
+3. [CLAUDE.md](../CLAUDE.md) - AI 개발 도구 활용법
 
-### 🚀 deployment/ - 배포 관련
-프로덕션 배포 및 환경 설정
+---
 
-- [DEPLOYMENT.md](deployment/DEPLOYMENT.md) - 배포 가이드
-- [DEPLOYMENT_INFO.md](deployment/DEPLOYMENT_INFO.md) - 배포 정보
-- [DEPLOYMENT_ISSUES.md](deployment/DEPLOYMENT_ISSUES.md) - 배포 문제 해결
-- [DEPLOYMENT_CHECKLIST.md](deployment/DEPLOYMENT_CHECKLIST.md) - 배포 체크리스트
-- [VERCEL_DEPLOYMENT_GUIDE.md](deployment/VERCEL_DEPLOYMENT_GUIDE.md) - Vercel 배포 가이드
-- [VERCEL_ENV_CHECK.md](deployment/VERCEL_ENV_CHECK.md) - Vercel 환경변수 확인
+## 📖 핵심 문서
 
-### 💻 development/ - 개발 가이드
-개발 워크플로우 및 기능 구현 가이드
+### 🛠️ 개발 & 기여
 
-- [MIGRATION_GUIDE.md](development/MIGRATION_GUIDE.md) - 마이그레이션 가이드
-- [REAL_DATA_INTEGRATION.md](development/REAL_DATA_INTEGRATION.md) - 실제 데이터 통합
-- [REMOVE_DUMMY_DATA.md](development/REMOVE_DUMMY_DATA.md) - 더미 데이터 제거
-- [NEXT_STEPS.md](development/NEXT_STEPS.md) - 다음 단계
-- [CREATE_PR_AUTO.md](development/CREATE_PR_AUTO.md) - 자동 PR 생성
+- [CONTRIBUTING.md](../CONTRIBUTING.md) - 기여 가이드라인
+- [DEVELOPMENT.md](../DEVELOPMENT.md) - 개발 워크플로우, 마이그레이션, PR 자동화
+- [CLAUDE.md](../CLAUDE.md) - Claude Code 활용 가이드
 
-### 🧪 testing/ - 테스트 가이드
-테스트 전략 및 실행 방법
+### 🚀 배포 & 운영
 
-- [E2E_TEST_QUICKSTART.md](testing/E2E_TEST_QUICKSTART.md) - E2E 테스트 빠른 시작
-- [PLAYWRIGHT_SETUP_SUMMARY.md](testing/PLAYWRIGHT_SETUP_SUMMARY.md) - Playwright 설정 요약
-- [PERFORMANCE_TEST_GUIDE.md](../PERFORMANCE_TEST_GUIDE.md) - 성능 테스트 가이드
+- [DEPLOYMENT.md](../DEPLOYMENT.md) - Vercel 배포 완전 가이드
+- [TESTING.md](../TESTING.md) - Unit, E2E, 성능 테스트
 
-### 🏗️ architecture/ - 아키텍처
-시스템 아키텍처 및 설계 문서
+### 🆘 문제 해결
 
-- [PERFORMANCE_ARCHITECTURE.md](../PERFORMANCE_ARCHITECTURE.md) - 성능 아키텍처
-- [NAVIGATION_OPTIMIZATION_SUMMARY.md](../NAVIGATION_OPTIMIZATION_SUMMARY.md) - 네비게이션 최적화
-- [NAVIGATION_PERFORMANCE.md](architecture/NAVIGATION_PERFORMANCE.md) - 네비게이션 성능
-- [PERFORMANCE_QUICK_REFERENCE.md](../PERFORMANCE_QUICK_REFERENCE.md) - 성능 빠른 참조
+- [TROUBLESHOOTING.md](../TROUBLESHOOTING.md) - 일반적인 문제 및 해결책
+- [CHANGELOG.md](../CHANGELOG.md) - 버전 히스토리
 
-### 📖 reference/ - 레퍼런스
-프로젝트 요약 및 참조 문서
+---
 
-- [PROJECT_SUMMARY.md](reference/PROJECT_SUMMARY.md) - 프로젝트 요약
-- [PERFORMANCE_OPTIMIZATION_COMPLETE.md](reference/PERFORMANCE_OPTIMIZATION_COMPLETE.md) - 성능 최적화 완료
+## 📂 역할별 문서 추천
+
+### 신규 개발자
+1. [QUICK_START.md](../QUICK_START.md) - 환경 설정 (20분)
+2. [CONTRIBUTING.md](../CONTRIBUTING.md) - 코드 스타일, PR 프로세스
+3. [DEVELOPMENT.md](../DEVELOPMENT.md) - 개발 워크플로우
+
+### 배포 담당자
+1. [DEPLOYMENT.md](../DEPLOYMENT.md) - 배포 절차
+2. [TROUBLESHOOTING.md](../TROUBLESHOOTING.md) - 배포 문제 해결
+3. [CHANGELOG.md](../CHANGELOG.md) - 버전 확인
+
+### QA/테스터
+1. [TESTING.md](../TESTING.md) - 테스트 실행 방법
+2. [tests/e2e/README.md](../tests/e2e/README.md) - E2E 테스트 상세
+3. [TROUBLESHOOTING.md](../TROUBLESHOOTING.md) - 테스트 문제 해결
+
+---
+
+## 📁 하위 문서
+
+### 스크립트
+- [scripts/README.md](../scripts/README.md) - 자동화 스크립트 사용법
+
+### 작업 관리
+- [tasks/README.md](../tasks/README.md) - PRD 및 Task List 관리
+
+### 테스트
+- [tests/e2e/README.md](../tests/e2e/README.md) - Playwright E2E 테스트 가이드
+
+---
+
+## 🗂️ 레거시 문서
+
+이전 문서들은 참조용으로 아카이브에 보관되어 있습니다:
+
+- [archive/](./archive/) - 구버전 문서 (27개)
+  - `setup/` - 환경 설정 가이드 (6개)
+  - `deployment/` - 배포 가이드 (6개)
+  - `development/` - 개발 가이드 (5개)
+  - `testing/` - 테스트 가이드 (2개)
+  - `architecture/` - 아키텍처 문서 (1개)
+  - `reference/` - 참조 문서 (2개)
+  - `planning/` - 계획 문서 (2개)
+
+**주의**: 아카이브 문서는 참조용입니다. 최신 정보는 루트 폴더의 통합 문서를 참조하세요.
 
 ---
 
 ## 🔍 문서 찾기 팁
 
-### 역할별 추천 문서
+### 검색 방법
 
-**신규 개발자**:
-1. [QUICK_START.md](setup/QUICK_START.md)
-2. [DATABASE_SETUP.md](setup/DATABASE_SETUP.md)
-3. [PROJECT_SUMMARY.md](reference/PROJECT_SUMMARY.md)
+**키워드로 검색**:
+```bash
+# 모든 문서에서 검색
+grep -r "키워드" *.md
 
-**배포 담당자**:
-1. [DEPLOYMENT_CHECKLIST.md](deployment/DEPLOYMENT_CHECKLIST.md)
-2. [VERCEL_DEPLOYMENT_GUIDE.md](deployment/VERCEL_DEPLOYMENT_GUIDE.md)
-3. [DEPLOYMENT_ISSUES.md](deployment/DEPLOYMENT_ISSUES.md)
+# 특정 주제 검색
+grep -r "Supabase" *.md
+grep -r "배포" *.md
+```
 
-**QA/테스터**:
-1. [E2E_TEST_QUICKSTART.md](testing/E2E_TEST_QUICKSTART.md)
-2. [PLAYWRIGHT_SETUP_SUMMARY.md](testing/PLAYWRIGHT_SETUP_SUMMARY.md)
-3. [PERFORMANCE_TEST_GUIDE.md](../PERFORMANCE_TEST_GUIDE.md)
+**파일명으로 찾기**:
+```bash
+# README 파일 찾기
+find . -name "README.md" -not -path "./node_modules/*"
+
+# 모든 .md 파일 찾기
+find . -name "*.md" -not -path "./node_modules/*"
+```
 
 ---
 
-**마지막 업데이트**: 2025-01-17
-**버전**: 1.0.0
+## 📋 문서 업데이트 이력
+
+### v2.0.0 (2025-01-17) - 대대적 구조 개편
+- 27개 문서 → 9개 핵심 문서로 통합 (67% 감소)
+- 역할 기반 네비게이션 추가
+- 레거시 문서 아카이브로 이동
+- 모든 문서 한글화 (일부 기술 용어 제외)
+
+### v1.0.0 (2025-01-13) - 초기 문서화
+- 카테고리별 문서 분리 (setup, deployment, development, testing)
+- 총 27개 개별 문서 작성
+
+---
+
+## 💡 문서 기여
+
+문서 개선에 참여하고 싶으신가요?
+
+1. 오타 또는 잘못된 정보 발견 시 [이슈 등록](https://github.com/garimto81/ojt-platform/issues)
+2. 문서 개선 제안은 [Pull Request](https://github.com/garimto81/ojt-platform/pulls) 생성
+3. [CONTRIBUTING.md](../CONTRIBUTING.md) 참조
+
+---
+
+## 🆘 추가 도움말
+
+- **Slack**: #ojt-platform-dev 채널
+- **Email**: support@ggproduction.com
+- **GitHub Issues**: [문제 보고](https://github.com/garimto81/ojt-platform/issues)
+
+---
+
+**버전**: 2.0.0 | **최종 업데이트**: 2025-01-17
