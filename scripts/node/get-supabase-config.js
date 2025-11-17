@@ -115,9 +115,9 @@ DATABASE_URL=${databaseUrl}
 
 ${geminiKey ? `# Google Gemini API for AI Quiz Generation
 GEMINI_API_KEY=${geminiKey}
-` : '# Google Gemini API for AI Quiz Generation
+` : `# Google Gemini API for AI Quiz Generation
 # GEMINI_API_KEY=your-gemini-api-key
-'}
+`}
 # App Configuration
 NEXT_PUBLIC_APP_URL=${appUrl || 'http://localhost:3000'}
 NODE_ENV=development
