@@ -1,0 +1,130 @@
+name: Phase 4 - Auto PR & Merge
+
+on:
+  push:
+    branches:
+      - 'feature/PRD-*'
+
+jobs:
+  auto-pr-merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract Version from Commit
+        id: version
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          VERSION=$(echo "$COMMIT_MSG" | grep -oP '\(v[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+)?\)' | tr -d '()')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "🏷️ Detected version: $VERSION"
+
+      - name: Extract PRD Number
+        id: prd
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          PRD=$(echo "$COMMIT_MSG" | grep -oP '\[PRD-[0-9]+\]')
+          PRD_NUM=$(echo "$PRD" | grep -oP '[0-9]+')
+          echo "prd=$PRD" >> $GITHUB_OUTPUT
+          echo "prd_num=$PRD_NUM" >> $GITHUB_OUTPUT
+          echo "📋 Detected PRD: $PRD"
+
+      - name: Check if PR already exists
+        id: pr_check
+        if: steps.version.outputs.version && steps.prd.outputs.prd
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_EXISTS=$(gh pr list --head ${{ github.ref_name }} --json number -q '.[0].number' || echo "")
+          echo "pr_exists=$PR_EXISTS" >> $GITHUB_OUTPUT
+          if [ -n "$PR_EXISTS" ]; then
+            echo "✅ PR already exists: #$PR_EXISTS"
+          else
+            echo "🆕 No existing PR found"
+          fi
+
+      - name: Create Pull Request
+        if: steps.version.outputs.version && steps.prd.outputs.prd && steps.pr_check.outputs.pr_exists == ''
+        id: create_pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          TITLE=$(echo "$COMMIT_MSG" | head -1)
+
+          # PR body 생성
+          PR_BODY=$(cat <<EOF
+          ## 🚀 Release ${{ steps.version.outputs.version }}
+
+          **PRD**: ${{ steps.prd.outputs.prd }}
+          **Branch**: \`${{ github.ref_name }}\`
+          **Commit**: ${{ github.sha }}
+
+          ### 📝 Changes
+          \`\`\`
+          $COMMIT_MSG
+          \`\`\`
+
+          ### ✅ Automated Checks
+          - [ ] Phase 1: 1:1 Test Pairing
+          - [ ] Phase 2: All Tests Pass
+          - [ ] Phase 5: E2E + Security
+
+          ---
+          🤖 Automated PR created by Phase 4 workflow
+          EOF
+          )
+
+          gh pr create \
+            --title "$TITLE" \
+            --body "$PR_BODY" \
+            --base main \
+            --head ${{ github.ref_name }} \
+            --label "automated,release"
+
+          PR_NUMBER=$(gh pr list --head ${{ github.ref_name }} --json number -q '.[0].number')
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "✅ Created PR #$PR_NUMBER"
+
+      - name: Get PR Number
+        id: get_pr
+        if: steps.version.outputs.version && steps.prd.outputs.prd
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=$(gh pr list --head ${{ github.ref_name }} --json number -q '.[0].number')
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Wait for CI Checks
+        if: steps.get_pr.outputs.pr_number
+        run: |
+          echo "⏳ Waiting 30 seconds for CI checks to start..."
+          sleep 30
+
+      - name: Enable Auto-Merge
+        if: steps.get_pr.outputs.pr_number
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "🔀 Enabling auto-merge for PR #${{ steps.get_pr.outputs.pr_number }}"
+          gh pr merge ${{ steps.get_pr.outputs.pr_number }} \
+            --squash \
+            --auto \
+            --delete-branch || echo "Auto-merge will trigger after checks pass"
+
+      - name: Summary
+        if: steps.version.outputs.version && steps.prd.outputs.prd
+        run: |
+          echo "## 🎉 Phase 4 Automation Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **PRD**: ${{ steps.prd.outputs.prd }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **PR**: #${{ steps.get_pr.outputs.pr_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: Auto-merge enabled ✅" >> $GITHUB_STEP_SUMMARY
